@@ -15,7 +15,7 @@ FRAME_TIME = 1 / 30  # redraw 30 times a second, even when the snake moves slowe
 screen = Screen()
 screen.setup(width=1200, height=800)
 screen.bgcolor(WINDOW_BG)
-screen.title("MJY Snake Game")
+screen.title("Matt Young Presents Rage Quit Snake")
 screen.tracer(0)
 register_shapes(screen)
 

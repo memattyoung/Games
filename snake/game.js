@@ -1,4 +1,4 @@
-// Drawing, controls and screens for MJY Snake. The rules live in logic.js.
+// Drawing, controls and screens for Rage Quit Snake. The rules live in logic.js.
 "use strict";
 
 const COLORS = {
@@ -35,7 +35,7 @@ const BORDER = 4;          // the board's border width in style.css
 
 const POPUP_TIME = 0.9;
 const SWIPE_DISTANCE = 24;
-const BEST_KEY = "mjy-snake-best";
+const BEST_KEY = "mjy-snake-best";  // kept from the old name so saved best scores still load
 const HEAD_ANGLE = { up: 0, right: Math.PI / 2, down: Math.PI, left: -Math.PI / 2 };
 const KEY_DIRECTIONS = {
   ArrowUp: "up", KeyW: "up",
@@ -381,12 +381,14 @@ function showOverlay(kind) {
   const keyHint = isTouch ? "" : "or press Space";
 
   if (kind === "start") {
-    setText($("overlay-title"), "MJY SNAKE");
+    setText($("overlay-eyebrow"), "MATT YOUNG PRESENTS");
+    setText($("overlay-title"), "RAGE QUIT SNAKE");
     setText($("overlay-reason"), "");
     setText($("overlay-stats"), "Every apple is a mystery.");
     setText(playButton, "Play");
     setText($("overlay-hint"), isTouch ? "Swipe on the board or use the arrows to steer" : "or press Space");
   } else if (kind === "paused") {
+    setText($("overlay-eyebrow"), "");
     setText($("overlay-title"), "PAUSED");
     setText($("overlay-reason"), "");
     setText($("overlay-stats"), `Score ${game.score}`);
@@ -398,6 +400,7 @@ function showOverlay(kind) {
       best = game.score;
       saveBest(best);
     }
+    setText($("overlay-eyebrow"), "");
     setText($("overlay-title"), "GAME OVER");
     setText($("overlay-reason"), game.over);
     setText($("overlay-stats"),

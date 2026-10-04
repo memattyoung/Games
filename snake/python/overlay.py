@@ -27,10 +27,11 @@ class Overlay(Turtle):
         self.write(words, align="center", font=font)
 
     def show_start(self):
-        self.panel(440, 200)
-        self.text("MJY SNAKE", 30, GREEN, TITLE_FONT, shadow=True)
-        self.text("Read the rules on the right, then", -10, DIM_TEXT, ("Arial", 14, "normal"))
-        self.text("press SPACE to start", -50, TEXT, ("Arial", 20, "bold"))
+        self.panel(520, 240)
+        self.text("MATT YOUNG PRESENTS", 72, DIM_TEXT, ("Arial", 14, "bold"))
+        self.text("RAGE QUIT SNAKE", 15, GREEN, TITLE_FONT, shadow=True)
+        self.text("Read the rules on the right, then", -25, DIM_TEXT, ("Arial", 14, "normal"))
+        self.text("press SPACE to start", -65, TEXT, ("Arial", 20, "bold"))
 
     def show_game_over(self, reason, score, longest):
         self.panel(460, 250)

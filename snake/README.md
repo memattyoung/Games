@@ -1,4 +1,6 @@
-# MJY Snake
+# Rage Quit Snake
+
+Matt Young presents **Rage Quit Snake**.
 
 **[Play it here](https://memattyoung.github.io/Games/snake/)** on a phone or a computer.
 

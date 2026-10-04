@@ -1,4 +1,4 @@
-// The rules of MJY Snake, with no drawing code, so they can be tested on their own.
+// The rules of Rage Quit Snake, with no drawing code, so they can be tested on their own.
 // game.js handles drawing and controls.
 "use strict";
 

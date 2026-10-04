@@ -202,9 +202,19 @@ body {
   text-align: center;
 }
 
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--dim);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+.eyebrow:empty { display: none; }
+
 .panel h1 {
   margin: 0;
-  font-size: clamp(30px, 8vw, 44px);
+  font-size: clamp(28px, 7.5vw, 44px);
+  line-height: 1.1;
   font-weight: 800;
   color: var(--green);
   text-shadow: 3px 3px 0 #000;
