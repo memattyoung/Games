@@ -1,4 +1,4 @@
-# Games
+# Matt Young's Games
 
 Games I've made while learning to code.
 

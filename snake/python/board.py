@@ -33,6 +33,22 @@ DEAD_HEAD_COLOR = "#E2574C"
 DEAD_START = "#D0493F"
 DEAD_END = "#6E2420"
 
+# The snake changes color while an effect is on it, so it's obvious
+DRUNK_HEAD_COLOR = "#C08CFF"
+DRUNK_START = "#A66BEA"
+DRUNK_END = "#5B2E91"
+REVERSED_HEAD_COLOR = "#FFB25C"
+REVERSED_START = "#F59A3C"
+REVERSED_END = "#9A4B12"
+GHOST_TINT = "#DDEFFF"   # ghosts are mixed 55% toward this, so they look see-through
+GHOST_AMOUNT = 0.55
+
+CYAN = "#6FE3FF"
+ORANGE = "#F59A3C"
+PINK = "#FF8FD0"
+FOG_COLOR = "#05080C"
+RAINBOW = ["#FF5A5A", "#FFA63D", "#FFE14D", "#6EE06E", "#4DB8FF", "#B57BFF"]
+
 
 def blend(color1, color2, amount):
     """Mix two "#rrggbb" colors. An amount of 0 gives color1, 1 gives color2."""
@@ -42,6 +58,14 @@ def blend(color1, color2, amount):
         end = int(color2[i:i + 2], 16)
         mixed += "%02x" % round(start + (end - start) * amount)
     return mixed
+
+
+def show_if(turtle, visible):
+    """Show or hide a turtle, but only touch it when that actually changes."""
+    if visible and not turtle.isvisible():
+        turtle.showturtle()
+    elif not visible and turtle.isvisible():
+        turtle.hideturtle()
 
 
 def draw_rect(pen, left, bottom, width, height, color):
@@ -127,13 +151,52 @@ def make_apple(skin, shine):
     return apple
 
 
+def star(center_x, center_y, size):
+    """A little four-pointed sparkle."""
+    points = []
+    for i in range(8):
+        angle = math.pi / 4 * i
+        reach = size if i % 2 == 0 else size * 0.3
+        points.append((center_x + reach * math.cos(angle), center_y + reach * math.sin(angle)))
+    return tuple(points)
+
+
+SPARKLE_SPOTS = [(-10, 8), (10, 5), (-8, -9), (9, -8), (1, 13), (-12, 0)]
+
+
+def make_rainbow_apple(index):
+    # The jackpot apple: each frame of its animation is a different color, with
+    # sparkles in different places, so it shimmers as it cycles through them
+    skin = RAINBOW[index]
+    apple = make_apple(skin, "#FFFFFF")
+    for spot in (SPARKLE_SPOTS[index], SPARKLE_SPOTS[(index + 3) % len(SPARKLE_SPOTS)]):
+        apple.addcomponent(star(spot[0], spot[1], 3), "#FFF6C8")
+    return apple
+
+
+def make_rock():
+    rock = Shape("compound")
+    outline = ((-9, -6), (-6, -9), (2, -9.5), (8, -7), (9.5, -1), (7, 6), (1, 9), (-5, 8.5), (-9.5, 3))
+    rock.addcomponent(outline, "#7D8590", "#454B54")
+    rock.addcomponent(ellipse(-3, 3, 3.2, 1.8, tilt=20), "#A3ABB5")
+    rock.addcomponent(((1, -3), (5, 1.5), (4, 2.2), (0.2, -2.2)), "#4F5660")
+    rock.addcomponent(ellipse(4, -5, 2, 1.2, tilt=-15), "#6A717B")
+    return rock
+
+
 def register_shapes(screen):
     screen.register_shape("segment", rounded_square(9, 3.5))
     screen.register_shape("snake_head", make_head(HEAD_COLOR))
     screen.register_shape("dead_head", make_head(DEAD_HEAD_COLOR, dead=True))
+    screen.register_shape("drunk_head", make_head(DRUNK_HEAD_COLOR))
+    screen.register_shape("reversed_head", make_head(REVERSED_HEAD_COLOR))
+    screen.register_shape("ghost_head", make_head(blend(HEAD_COLOR, GHOST_TINT, GHOST_AMOUNT)))
     screen.register_shape("apple", make_apple("#E8453C", "#FF9A8F"))
     screen.register_shape("golden_apple", make_apple(GOLD, "#FFF2B8"))
     screen.register_shape("poison_apple", make_apple("#9B4DCA", "#E0BFFF"))
+    for index in range(len(RAINBOW)):
+        screen.register_shape(f"rainbow_{index}", make_rainbow_apple(index))
+    screen.register_shape("rock", make_rock())
 
 
 def draw_board():

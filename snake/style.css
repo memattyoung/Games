@@ -51,8 +51,8 @@ body {
   flex: 1;
   min-width: 0;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  grid-template-areas: "hud" "board" "dpad";
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-areas: "hud" "effects" "board" "dpad";
   gap: 10px;
 }
 
@@ -63,8 +63,8 @@ body {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   grid-template-areas:
-    "score food hunger"
-    "stats stats effects";
+    "score stats hunger"
+    "food food food";
   align-items: center;
   column-gap: 20px;
   row-gap: 6px;
@@ -126,9 +126,15 @@ body {
 .hud-effects {
   grid-area: effects;
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 6px;
+  width: 100%;
+  max-width: var(--board-width, none);  /* lines up with the board */
   min-height: 22px;
+  justify-self: center;
+  padding: 0 4px;
+  font-weight: 700;
 }
 
 .pill {
@@ -136,12 +142,14 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 150px;
+  min-width: 84px;
   height: 22px;
+  padding: 0 11px;
   border-radius: 11px;
-  background: var(--purple-track);
+  background: var(--pill-track);
   overflow: hidden;
   font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 .pill-fill {
   position: absolute;
@@ -149,9 +157,15 @@ body {
   bottom: 0;
   left: 0;
   border-radius: 11px;
-  background: var(--purple-deep);
+  background: var(--pill-fill);
 }
 .pill-text { position: relative; }
+.pill-orange { --pill-track: #3A2414; --pill-fill: #B8621F; }
+.pill-purple { --pill-track: #2B2140; --pill-fill: #7444B8; }
+.pill-grey { --pill-track: #262E38; --pill-fill: #5B6878; }
+.pill-red { --pill-track: #3A1A1A; --pill-fill: #B23A3A; }
+.pill-cyan { --pill-track: #12303A; --pill-fill: #1D8BA3; }
+.pill-gold { --pill-track: #3A3214; --pill-fill: #A88414; }
 
 .apple-icon {
   width: 20px;
@@ -230,7 +244,12 @@ body {
   margin: 8px 0 0;
   color: var(--dim);
 }
-.reason:empty, .stats:empty, .hint:empty { display: none; }
+.breakdown {
+  margin: 6px 0 0;
+  color: var(--dim);
+  font-size: 13px;
+}
+.reason:empty, .stats:empty, .breakdown:empty, .hint:empty { display: none; }
 
 .play {
   margin-top: 18px;
@@ -315,6 +334,9 @@ body {
   background: var(--panel);
   font-size: 13px;
   line-height: 1.36;
+  padding-bottom: 28px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
 }
 .rules h2 {
   margin: 0 0 4px;
@@ -335,10 +357,18 @@ body {
   margin: 2px 0 0;
   padding-left: 18px;
 }
+.rules li { margin-bottom: 1px; }
 .rules .danger { color: var(--red); }
 .normal { color: var(--text); }
 .benefit { color: var(--gold); }
 .bad { color: var(--purple); }
+.reversed { color: #FFA24C; }
+.jackpot {
+  background: linear-gradient(90deg, #FF6B6B, #FFB347, #FFE14D, #6BDB77, #5CC2FF, #B98AF0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 
 .food-rule {
   display: flex;
@@ -385,19 +415,19 @@ body {
     grid-template-areas:
       "score stats"
       "hunger hunger"
-      "food food"
-      "effects effects";
+      "food food";
     font-size: 14px;
   }
   .hud-stats { justify-content: flex-end; gap: 16px; }
   .hud-hunger { justify-content: flex-start; }
   .bar { flex: 1; width: auto; }
-  .hud-effects { justify-content: flex-start; }
-  .pill { width: 140px; }
+  .hud-effects { min-height: 50px; }
 
   .rules {
     width: auto;
     overflow: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
   .rules-link { display: block; width: fit-content; margin: 12px auto 0; }
 }
@@ -406,23 +436,24 @@ body {
 @media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
   .game {
     min-height: 280px;
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) 220px;
+    grid-template-rows: auto auto minmax(0, 1fr);
     grid-template-areas:
       "hud hud"
+      "board effects"
       "board dpad";
   }
+  .hud-effects { min-height: 0; max-width: none; }
   .hud {
     grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas:
-      "score food hunger"
-      "stats stats effects";
+      "score stats hunger"
+      "food food food";
     max-width: none;
     font-size: 13px;
   }
   .bar { flex: none; width: 140px; }
   .hud-hunger { justify-content: flex-end; }
   .hud-effects { justify-content: flex-end; }
-  .pill { width: 120px; }
   .dpad { align-self: center; }
 }

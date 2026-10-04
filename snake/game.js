@@ -10,21 +10,39 @@ const COLORS = {
   red: "#F05A4F",
   gold: "#F5C542",
   purple: "#B98AF0",
-  head: "#8BE05F",
-  bodyStart: "#6FCF4E",
-  bodyEnd: "#2C7A3A",
-  deadHead: "#E2574C",
-  deadStart: "#D0493F",
-  deadEnd: "#6E2420",
+  orange: "#FFA24C",
+  cyan: "#6FE3FF",
+  fog: "5, 8, 12",   // as "r, g, b" so it can fade
+  ghost: "#DDEFFF",
 };
-// Every apple on the board is the normal red one. The other colors only show
-// up next to the score, to reveal what an apple really was.
+// How the snake looks. Drunk turns it purple and reversed turns it orange, so it's obvious.
+const LOOKS = {
+  normal: { head: "#8BE05F", start: "#6FCF4E", end: "#2C7A3A" },
+  drunk: { head: "#C08CFF", start: "#A66BEA", end: "#5B2E91" },
+  reversed: { head: "#FFB25C", start: "#F59A3C", end: "#9A4B12" },
+  dead: { head: "#E2574C", start: "#D0493F", end: "#6E2420" },
+};
+// Every apple on the board is the normal red one (apart from the rainbow apple). The other
+// colors only show up next to the score, to reveal what an apple really was.
 const APPLES = {
   normal: { skin: "#E8453C", shine: "#FF9A8F" },
   benefit: { skin: "#F5C542", shine: "#FFF2B8" },
   bad: { skin: "#9B4DCA", shine: "#E0BFFF" },
+  jackpot: { rainbow: true, shine: "#FFFFFF" },
 };
-const TYPE_COLORS = { normal: COLORS.text, benefit: COLORS.gold, bad: COLORS.purple };
+const TYPE_COLORS = { normal: COLORS.text, benefit: COLORS.gold, bad: COLORS.purple, jackpot: "#FFD45C" };
+
+// The countdown pills above the board, in the order they appear
+const EFFECTS = [
+  { name: "REVERSED", color: "orange", left: () => game.reversedLeft(), total: () => SETTINGS.effectTime },
+  { name: "DRUNK", color: "purple", left: () => game.drunkLeft(), total: () => SETTINGS.effectTime },
+  { name: "FOG", color: "grey", left: () => game.fogLeft(), total: () => SETTINGS.fogTime },
+  { name: "RUNAWAY", color: "red", left: () => game.runawayLeft(), total: () => SETTINGS.effectTime },
+  { name: "GHOST", color: "cyan", left: () => game.ghostLeft(), total: () => SETTINGS.effectTime },
+  { name: "SHIELD", color: "cyan", left: () => (game.shield ? 1 : 0), total: () => 1, noTimer: true },
+  { name: "COMBO", color: "gold", left: () => game.comboLeft(), total: () => SETTINGS.comboTime,
+    label: () => `COMBO ×${game.combo}` },
+];
 
 const FULL_COLS = 39;      // the same board size as the Python version...
 const FULL_ROWS = 36;
@@ -34,6 +52,7 @@ const MIN_CELLS = 12;
 const BORDER = 4;          // the board's border width in style.css
 
 const POPUP_TIME = 0.9;
+const FLASH_TIME = 2;      // effects flash on and off for their last 2 seconds
 const SWIPE_DISTANCE = 24;
 const BEST_KEY = "mjy-snake-best";  // kept from the old name so saved best scores still load
 const HEAD_ANGLE = { up: 0, right: Math.PI / 2, down: Math.PI, left: -Math.PI / 2 };
@@ -43,6 +62,8 @@ const KEY_DIRECTIONS = {
   ArrowLeft: "left", KeyA: "left",
   ArrowRight: "right", KeyD: "right",
 };
+// A lumpy boulder, designed on a 20px cell
+const ROCK_SHAPE = [[-8, 4], [-7, -3], [-3, -8], [3, -7], [8, -2], [8, 5], [3, 8], [-4, 8]];
 
 const $ = (id) => document.getElementById(id);
 const boardWrap = $("board-wrap");
@@ -83,6 +104,12 @@ function setText(element, text) {
   // Only touch the page when something actually changed
   text = String(text);
   if (element.textContent !== text) element.textContent = text;
+}
+
+function showing(timeLeft, now) {
+  // An effect's look flashes on and off during its last couple of seconds
+  if (timeLeft <= 0) return false;
+  return timeLeft > FLASH_TIME || Math.floor(now / 150) % 2 === 0;
 }
 
 function loadBest() {
@@ -160,19 +187,29 @@ function roundedRect(c, x, y, w, h, r) {
   c.closePath();
 }
 
-function drawApple(c, cx, cy, size, kind) {
+function centerOf(spot) {
+  return [(spot.x + 0.5) * cell, (spot.y + 0.5) * cell];
+}
+
+function drawApple(c, cx, cy, size, colors) {
   // Designed on a 20px cell, then scaled to fit
-  const colors = APPLES[kind];
   c.save();
   c.translate(cx, cy);
   c.scale(size / 20, size / 20);
 
   c.beginPath();
   c.ellipse(0, 1, 8.5, 8, 0, 0, Math.PI * 2);
-  c.fillStyle = colors.skin;
+  if (colors.rainbow) {
+    const rainbow = c.createLinearGradient(-8, -7, 8, 9);
+    ["#FF4D4D", "#FFA23A", "#FFE14D", "#5DDB6A", "#4DB8FF", "#B57BFF"].forEach((color, i, all) =>
+      rainbow.addColorStop(i / (all.length - 1), color));
+    c.fillStyle = rainbow;
+  } else {
+    c.fillStyle = colors.skin;
+  }
   c.fill();
   c.lineWidth = 1;
-  c.strokeStyle = blend(colors.skin, "#000000", 0.25);
+  c.strokeStyle = colors.outline || (colors.skin ? blend(colors.skin, "#000000", 0.25) : "#5A3A10");
   c.stroke();
 
   c.beginPath();
@@ -196,6 +233,77 @@ function drawApple(c, cx, cy, size, kind) {
   c.restore();
 }
 
+function drawSparkle(x, y, size) {
+  // A little four-pointed star
+  ctx.beginPath();
+  ctx.moveTo(x, y - size);
+  ctx.quadraticCurveTo(x, y, x + size, y);
+  ctx.quadraticCurveTo(x, y, x, y + size);
+  ctx.quadraticCurveTo(x, y, x - size, y);
+  ctx.quadraticCurveTo(x, y, x, y - size);
+  ctx.fill();
+}
+
+function drawJackpot(now) {
+  const jackpot = game.jackpot;
+  const [cx, cy] = centerOf(jackpot);
+  const timeLeft = jackpot.until - game.time;
+  // Blink during its last moments so you know it's about to vanish
+  if (timeLeft < 1.5 && Math.floor(now / 120) % 2 === 0) return;
+
+  const pulse = 0.5 + 0.5 * Math.sin(now / 160);
+  const glow = ctx.createRadialGradient(cx, cy, cell * 0.2, cx, cy, cell * (0.9 + 0.2 * pulse));
+  glow.addColorStop(0, "rgba(255, 240, 180, 0.55)");
+  glow.addColorStop(1, "rgba(255, 240, 180, 0)");
+  ctx.fillStyle = glow;
+  ctx.fillRect(cx - cell * 1.2, cy - cell * 1.2, cell * 2.4, cell * 2.4);
+
+  const hue = (now / 6) % 360;
+  drawApple(ctx, cx, cy, cell * 1.05, {
+    skin: `hsl(${hue}, 85%, 58%)`,
+    shine: `hsl(${hue}, 90%, 88%)`,
+    outline: `hsl(${hue}, 70%, 30%)`,
+  });
+
+  ctx.fillStyle = "#FFFFFF";
+  for (let k = 0; k < 3; k++) {
+    const angle = now / 380 + (k * Math.PI * 2) / 3;
+    const twinkle = 0.6 + 0.4 * Math.sin(now / 90 + k * 2);
+    drawSparkle(cx + Math.cos(angle) * cell * 0.7, cy + Math.sin(angle) * cell * 0.7, cell * 0.16 * twinkle);
+  }
+}
+
+function drawRock(rock) {
+  const [cx, cy] = centerOf(rock);
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(((rock.x * 7 + rock.y * 3) % 4) * (Math.PI / 2));  // so they don't all look the same
+  ctx.scale(cell / 20, cell / 20);
+  ctx.beginPath();
+  ROCK_SHAPE.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
+  ctx.closePath();
+  ctx.fillStyle = "#7D8794";
+  ctx.fill();
+  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = "#3E4651";
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(-5, -2);
+  ctx.lineTo(-2, -5);
+  ctx.lineTo(2, -5);
+  ctx.strokeStyle = "#AAB3BE";
+  ctx.lineWidth = 1.6;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(1, 1);
+  ctx.lineTo(4, 3);
+  ctx.lineTo(3, 6);
+  ctx.strokeStyle = "#4E5763";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.restore();
+}
+
 function drawSegment(segment, fill) {
   const size = cell * 0.9;
   const x = segment.x * cell + (cell - size) / 2;
@@ -208,14 +316,13 @@ function drawSegment(segment, fill) {
   ctx.stroke();
 }
 
-function drawHead(segment, heading, dead, now) {
+function drawHead(segment, skin, dead, wobble, now) {
   // Drawn facing up, then turned to face the way the snake is going
   ctx.save();
-  ctx.translate((segment.x + 0.5) * cell, (segment.y + 0.5) * cell);
-  ctx.rotate(HEAD_ANGLE[heading]);
+  ctx.translate(...centerOf(segment));
+  ctx.rotate(HEAD_ANGLE[game.heading] + wobble);
   ctx.scale(cell / 20, cell / 20);
 
-  const skin = dead ? COLORS.deadHead : COLORS.head;
   roundedRect(ctx, -10, -10, 20, 20, 5);
   ctx.fillStyle = skin;
   ctx.fill();
@@ -266,18 +373,61 @@ function drawHead(segment, heading, dead, now) {
 
 function drawSnake(now) {
   const segments = game.segments;
+  if (segments.length === 0) return;
   const dead = Boolean(game.over);
+  const drunk = !dead && showing(game.drunkLeft(), now);
+  const reversed = !dead && showing(game.reversedLeft(), now);
+  const ghost = !dead && showing(game.ghostLeft(), now);
   const bodyLength = segments.length - 1;
+
+  const lookFor = (index) => {
+    if (dead) return LOOKS.dead;
+    if (drunk && reversed) return index % 2 === 0 ? LOOKS.reversed : LOOKS.drunk;  // stripes
+    if (drunk) return LOOKS.drunk;
+    if (reversed) return LOOKS.reversed;
+    return LOOKS.normal;
+  };
+  // A ghost is pale and see-through
+  const paint = (color) => (ghost ? blend(color, COLORS.ghost, 0.55) : color);
+  ctx.globalAlpha = ghost ? 0.7 : 1;
 
   // Tail first, so each segment sits on top of the one behind it
   for (let i = segments.length - 1; i >= 1; i--) {
+    const look = lookFor(i);
     const shade = bodyLength > 1 ? (i - 1) / (bodyLength - 1) : 0;
-    const fill = dead
-      ? blend(COLORS.deadStart, COLORS.deadEnd, shade)
-      : blend(COLORS.bodyStart, COLORS.bodyEnd, shade);
-    drawSegment(segments[i], fill);
+    drawSegment(segments[i], paint(blend(look.start, look.end, shade)));
   }
-  if (segments.length > 0) drawHead(segments[0], game.heading, dead, now);
+
+  const headLook = dead ? LOOKS.dead : drunk ? LOOKS.drunk : reversed ? LOOKS.reversed : LOOKS.normal;
+  const wobble = !dead && game.drunkLeft() > 0 ? Math.sin(now / 110) * 0.2 : 0;
+  drawHead(segments[0], paint(headLook.head), dead, wobble, now);
+  ctx.globalAlpha = 1;
+
+  if (game.shield && !dead) {
+    const [cx, cy] = centerOf(segments[0]);
+    ctx.beginPath();
+    ctx.arc(cx, cy, cell * 0.8, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(111, 227, 255, 0.15)";
+    ctx.fill();
+    ctx.strokeStyle = COLORS.cyan;
+    ctx.globalAlpha = 0.75 + 0.25 * Math.sin(now / 150);
+    ctx.lineWidth = Math.max(2.5, cell * 0.14);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+}
+
+function drawFog() {
+  const timeLeft = game.fogLeft();
+  if (timeLeft <= 0 || game.segments.length === 0) return;
+  // Darkness everywhere except a small circle around the head; it lifts gently at the end
+  const strength = Math.min(1, timeLeft / 0.4) * 0.97;
+  const [cx, cy] = centerOf(game.segments[0]);
+  const fog = ctx.createRadialGradient(cx, cy, cell * 2.5, cx, cy, cell * (SETTINGS.fogRadius + 0.5));
+  fog.addColorStop(0, `rgba(${COLORS.fog}, 0)`);
+  fog.addColorStop(1, `rgba(${COLORS.fog}, ${strength})`);
+  ctx.fillStyle = fog;
+  ctx.fillRect(0, 0, cols * cell, rows * cell);
 }
 
 function drawPopups(now) {
@@ -290,8 +440,8 @@ function drawPopups(now) {
   popups = popups.filter((popup) => now - popup.born < POPUP_TIME * 1000);
   for (const popup of popups) {
     const progress = (now - popup.born) / (POPUP_TIME * 1000);
-    const x = (popup.x + 0.5) * cell;
-    const y = (popup.y + 0.5) * cell - 8 * scale - 35 * scale * progress;
+    const [x, centerY] = centerOf(popup);
+    const y = centerY - 8 * scale - (popup.row || 0) * 18 * scale - 35 * scale * progress;
     ctx.globalAlpha = 1 - progress * progress;
     ctx.lineWidth = 4;
     ctx.strokeStyle = COLORS.boardDark;
@@ -305,10 +455,20 @@ function drawPopups(now) {
 function draw(now) {
   ctx.clearRect(0, 0, cols * cell, rows * cell);
   ctx.drawImage(background, 0, 0, cols * cell, rows * cell);
-  for (const food of game.foods) {
-    if (food) drawApple(ctx, (food.x + 0.5) * cell, (food.y + 0.5) * cell, cell, "normal");
-  }
+  for (const rock of game.rocks) drawRock(rock);
+
+  // Runaway apples bounce nervously
+  const running = game.runawayLeft() > 0;
+  game.foods.forEach((food, i) => {
+    if (!food) return;
+    const [cx, cy] = centerOf(food);
+    const bob = running ? Math.sin(now / 70 + i * 2) * cell * 0.12 : 0;
+    drawApple(ctx, cx, cy + bob, cell, APPLES.normal);
+  });
+  if (game.jackpot) drawJackpot(now);
+
   drawSnake(now);
+  drawFog();
   drawPopups(now);
 }
 
@@ -319,7 +479,7 @@ function paintIcon(iconCanvas, kind) {
   const c = iconCanvas.getContext("2d");
   c.setTransform(dpr, 0, 0, dpr, 0, 0);
   c.clearRect(0, 0, 20, 20);
-  drawApple(c, 10, 10.5, 18, kind);
+  drawApple(c, 10, 10.5, 18, APPLES[kind]);
 }
 
 // ---------- Scoreboard ----------
@@ -333,9 +493,17 @@ const hud = {
   lastFood: $("last-food"),
   lastFoodIcon: $("last-food-icon"),
   lastFoodText: $("last-food-text"),
-  reversed: $("pill-reversed"),
-  drunk: $("pill-drunk"),
+  effects: $("effects"),
 };
+
+// One pill per effect, built once and shown or hidden as needed
+for (const effect of EFFECTS) {
+  effect.pill = document.createElement("span");
+  effect.pill.className = `pill pill-${effect.color}`;
+  effect.pill.hidden = true;
+  effect.pill.innerHTML = '<span class="pill-fill"></span><span class="pill-text"></span>';
+  hud.effects.appendChild(effect.pill);
+}
 
 function hungerColor(hunger) {
   // Green when it's just lost a segment, turning yellow then red as the next one gets close
@@ -343,12 +511,16 @@ function hungerColor(hunger) {
   return blend(COLORS.gold, COLORS.red, (hunger - 0.5) * 2);
 }
 
-function updatePill(pill, name, timeLeft) {
-  pill.hidden = timeLeft <= 0;
-  if (timeLeft <= 0) return;
-  // The pill drains from full to empty as the effect wears off
-  pill.querySelector(".pill-fill").style.width = ((timeLeft / SETTINGS.effectTime) * 100).toFixed(1) + "%";
-  setText(pill.querySelector(".pill-text"), `${name}  ${timeLeft.toFixed(1)}s`);
+function updateEffects() {
+  for (const effect of EFFECTS) {
+    const timeLeft = effect.left();
+    effect.pill.hidden = timeLeft <= 0;
+    if (timeLeft <= 0) continue;
+    // Each pill drains from full to empty as the effect wears off
+    effect.pill.firstChild.style.width = ((timeLeft / effect.total()) * 100).toFixed(1) + "%";
+    const name = effect.label ? effect.label() : effect.name;
+    setText(effect.pill.lastChild, effect.noTimer ? name : `${name}  ${timeLeft.toFixed(1)}s`);
+  }
 }
 
 function updateHud() {
@@ -361,9 +533,7 @@ function updateHud() {
   hud.hungerLabel.classList.toggle("starving", starving);
   hud.hungerFill.style.width = (Math.min(game.hunger, 1) * 100).toFixed(1) + "%";
   hud.hungerFill.style.background = starving ? COLORS.red : hungerColor(game.hunger);
-
-  updatePill(hud.reversed, "REVERSED", game.reversedLeft());
-  updatePill(hud.drunk, "DRUNK", game.drunkLeft());
+  updateEffects();
 }
 
 function showLastFood(kind, text) {
@@ -379,16 +549,16 @@ function showOverlay(kind) {
   overlay.hidden = false;
   overlay.classList.toggle("over", kind === "over");
   const keyHint = isTouch ? "" : "or press Space";
+  setText($("overlay-eyebrow"), kind === "start" ? "MATT YOUNG PRESENTS" : "");
+  setText($("overlay-breakdown"), "");
 
   if (kind === "start") {
-    setText($("overlay-eyebrow"), "MATT YOUNG PRESENTS");
     setText($("overlay-title"), "RAGE QUIT SNAKE");
     setText($("overlay-reason"), "");
     setText($("overlay-stats"), "Every apple is a mystery.");
     setText(playButton, "Play");
     setText($("overlay-hint"), isTouch ? "Swipe on the board or use the arrows to steer" : "or press Space");
   } else if (kind === "paused") {
-    setText($("overlay-eyebrow"), "");
     setText($("overlay-title"), "PAUSED");
     setText($("overlay-reason"), "");
     setText($("overlay-stats"), `Score ${game.score}`);
@@ -400,11 +570,13 @@ function showOverlay(kind) {
       best = game.score;
       saveBest(best);
     }
-    setText($("overlay-eyebrow"), "");
+    const ate = game.eaten;
     setText($("overlay-title"), "GAME OVER");
     setText($("overlay-reason"), game.over);
     setText($("overlay-stats"),
       `Score ${game.score}  ·  Longest ${game.longest}  ·  ` + (newBest ? "New best!" : `Best ${best}`));
+    setText($("overlay-breakdown"),
+      `Ate ${ate.normal} normal · ${ate.benefit} benefit · ${ate.bad} bad · ${ate.jackpot} rainbow`);
     setText(playButton, "Play again");
     setText($("overlay-hint"), keyHint);
   }
@@ -443,14 +615,22 @@ function primaryAction() {
   else if (mode === "start" || mode === "over") startGame();
 }
 
+function addPopup(spot, text, color, row = 0) {
+  popups.push({ x: spot.x, y: spot.y, text, color, row, born: performance.now() });
+}
+
 function handleEvents() {
-  const now = performance.now();
   for (const event of game.events) {
     if (event.type === "ate") {
       showLastFood(event.food, event.text);
-      popups.push({ x: event.x, y: event.y, text: event.popup, color: TYPE_COLORS[event.food], born: now });
+      addPopup(event, event.popup, TYPE_COLORS[event.food]);
+      if (event.combo >= 2) addPopup(event, `COMBO ×${event.combo}`, COLORS.gold, 1);
     } else if (event.type === "lost") {
-      popups.push({ x: event.x, y: event.y, text: "-1", color: COLORS.dim, born: now });
+      addPopup(event, "-1", COLORS.dim);
+    } else if (event.type === "saved") {
+      addPopup(event, "SAVED!", COLORS.cyan);
+    } else if (event.type === "jackpot") {
+      addPopup(event, "RAINBOW!", TYPE_COLORS.jackpot);
     } else if (event.type === "over") {
       mode = "over";
       showOverlay("over");

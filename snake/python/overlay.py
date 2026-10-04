@@ -33,13 +33,14 @@ class Overlay(Turtle):
         self.text("Read the rules on the right, then", -25, DIM_TEXT, ("Arial", 14, "normal"))
         self.text("press SPACE to start", -65, TEXT, ("Arial", 20, "bold"))
 
-    def show_game_over(self, reason, score, longest):
-        self.panel(460, 250)
-        self.text("GAME OVER", 45, RED, TITLE_FONT, shadow=True)
-        self.text(reason, 10, TEXT, ("Arial", 18, "bold"))
-        self.text(f"Score {score}     Longest snake {longest}", -25, DIM_TEXT, ("Arial", 15, "normal"))
-        self.text("Press SPACE to play again", -70, TEXT, ("Arial", 18, "bold"))
-        self.text("or close the window to quit", -95, DIM_TEXT, ("Arial", 12, "normal"))
+    def show_game_over(self, reason, score, longest, breakdown):
+        self.panel(480, 280)
+        self.text("GAME OVER", 60, RED, TITLE_FONT, shadow=True)
+        self.text(reason, 25, TEXT, ("Arial", 18, "bold"))
+        self.text(f"Score {score}     Longest snake {longest}", -10, DIM_TEXT, ("Arial", 15, "normal"))
+        self.text(breakdown, -35, DIM_TEXT, ("Arial", 13, "normal"))
+        self.text("Press SPACE to play again", -80, TEXT, ("Arial", 18, "bold"))
+        self.text("or close the window to quit", -105, DIM_TEXT, ("Arial", 12, "normal"))
 
     def hide(self):
         self.clear()
