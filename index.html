@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0D131A">
+  <title>MJY Games</title>
+  <style>
+    :root { --bg: #0D131A; --panel: #141C26; --border: #2E4053; --text: #E8EEF4; --dim: #8090A0; --green: #7BD65B; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 48px 16px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    main { max-width: 640px; margin: 0 auto; }
+    h1 { margin: 0 0 6px; font-size: 40px; color: var(--green); text-shadow: 3px 3px 0 #000; }
+    p { margin: 0 0 28px; color: var(--dim); }
+    a.game {
+      display: block;
+      padding: 20px 22px;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel);
+      color: inherit;
+      text-decoration: none;
+    }
+    a.game:hover { border-color: var(--green); }
+    a.game h2 { margin: 0 0 4px; font-size: 22px; }
+    a.game span { color: var(--dim); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>MJY GAMES</h1>
+    <p>Games I've made while learning to code.</p>
+    <a class="game" href="snake/">
+      <h2>MJY Snake</h2>
+      <span>Snake where every apple is a mystery. Works on phones and computers.</span>
+    </a>
+  </main>
+</body>
+</html>

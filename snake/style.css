@@ -1,0 +1,418 @@
+:root {
+  --window: #0D131A;
+  --panel: #141C26;
+  --board-dark: #18222D;
+  --border: #2E4053;
+  --track: #243140;
+  --text: #E8EEF4;
+  --dim: #8090A0;
+  --green: #7BD65B;
+  --red: #F05A4F;
+  --gold: #F5C542;
+  --purple: #B98AF0;
+  --purple-deep: #7444B8;
+  --purple-track: #2B2140;
+  --pad: 16px;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  background: var(--window);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--pad) + env(safe-area-inset-top)) calc(var(--pad) + env(safe-area-inset-right))
+           calc(var(--pad) + env(safe-area-inset-bottom)) calc(var(--pad) + env(safe-area-inset-left));
+}
+
+/* ---------- Layout: board on the left, rules on the right ---------- */
+
+.app {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  height: min(800px, calc(100vh - 2 * var(--pad)));
+  height: min(800px, calc(100dvh - 2 * var(--pad)));
+}
+
+.game {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas: "hud" "board" "dpad";
+  gap: 10px;
+}
+
+/* ---------- Scoreboard ---------- */
+
+.hud {
+  grid-area: hud;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "score food hunger"
+    "stats stats effects";
+  align-items: center;
+  column-gap: 20px;
+  row-gap: 6px;
+  width: 100%;
+  max-width: var(--board-width, none);  /* lines up with the board; set by game.js */
+  justify-self: center;
+  padding: 0 4px;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.label { color: var(--dim); }
+
+.hud-score { grid-area: score; }
+
+.hud-food {
+  grid-area: food;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 20px;
+}
+.hud-food.empty { visibility: hidden; }
+#last-food-text { overflow: hidden; text-overflow: ellipsis; }
+
+.hud-hunger {
+  grid-area: hunger;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+#hunger-label.starving { color: var(--red); }
+
+.bar {
+  display: block;
+  width: 180px;
+  height: 16px;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--track);
+}
+.bar-fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: 6px;
+  background: var(--green);
+}
+
+.hud-stats {
+  grid-area: stats;
+  display: flex;
+  gap: 24px;
+}
+
+.hud-effects {
+  grid-area: effects;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  min-height: 22px;
+}
+
+.pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--purple-track);
+  overflow: hidden;
+  font-size: 12px;
+}
+.pill-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 11px;
+  background: var(--purple-deep);
+}
+.pill-text { position: relative; }
+
+.apple-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* ---------- Board ---------- */
+
+.board-wrap {
+  grid-area: board;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;   /* swipes steer the snake instead of scrolling the page */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+#board {
+  display: block;
+  border: 4px solid var(--border);
+  border-radius: 6px;
+  background: var(--board-dark);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.panel {
+  width: 100%;
+  max-width: 460px;
+  padding: 24px 28px;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  background: var(--panel);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+
+.panel h1 {
+  margin: 0;
+  font-size: clamp(30px, 8vw, 44px);
+  font-weight: 800;
+  color: var(--green);
+  text-shadow: 3px 3px 0 #000;
+}
+.overlay.over h1 { color: var(--red); }
+
+.reason {
+  margin: 10px 0 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+.stats {
+  margin: 8px 0 0;
+  color: var(--dim);
+}
+.reason:empty, .stats:empty, .hint:empty { display: none; }
+
+.play {
+  margin-top: 18px;
+  padding: 12px 36px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--green);
+  color: var(--window);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.play:hover { filter: brightness(1.08); }
+.play:active { transform: translateY(1px); }
+.play:focus-visible { outline: 3px solid var(--text); outline-offset: 3px; }
+
+.hint {
+  margin: 10px 0 0;
+  color: var(--dim);
+  font-size: 13px;
+}
+
+.rules-link {
+  display: none;
+  margin-top: 12px;
+  color: var(--dim);
+  font-size: 14px;
+}
+
+/* ---------- Arrow buttons (touch screens only) ---------- */
+
+.dpad {
+  grid-area: dpad;
+  display: none;
+  grid-template-columns: repeat(3, 68px);
+  grid-template-rows: repeat(2, 58px);
+  grid-template-areas:
+    ". up pause"
+    "left down right";
+  justify-content: center;
+  gap: 8px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.dpad button {
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 22px;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.dpad button.pressed { background: var(--track); }
+.dpad [data-dir="up"] { grid-area: up; }
+.dpad [data-dir="down"] { grid-area: down; }
+.dpad [data-dir="left"] { grid-area: left; }
+.dpad [data-dir="right"] { grid-area: right; }
+.dpad .pause {
+  grid-area: pause;
+  width: 46px;
+  height: 46px;
+  justify-self: end;
+  align-self: start;
+  font-size: 15px;
+  color: var(--dim);
+}
+
+/* ---------- Rules ---------- */
+
+.rules {
+  width: 360px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding: 16px 22px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+  font-size: 13px;
+  line-height: 1.36;
+}
+.rules h2 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  color: var(--green);
+}
+.rules h3 {
+  margin: 13px 0 3px;
+  font-size: 14px;
+  color: var(--dim);
+}
+.rules h4 {
+  margin: 0;
+  font-size: 15px;
+}
+.rules p { margin: 0 0 5px; }
+.rules ul {
+  margin: 2px 0 0;
+  padding-left: 18px;
+}
+.rules .danger { color: var(--red); }
+.normal { color: var(--text); }
+.benefit { color: var(--gold); }
+.bad { color: var(--purple); }
+
+.food-rule {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 8px 0;
+}
+.food-rule .apple-icon { margin-top: 1px; }
+
+.touch-only { display: none; }
+
+/* ---------- Touch screens ---------- */
+
+@media (hover: none) and (pointer: coarse) {
+  .dpad { display: grid; }
+  .touch-only { display: inline; }
+  .keys-only { display: none; }
+}
+
+/* ---------- Narrow screens (phones): the game fills the screen, rules go below ---------- */
+
+@media (max-width: 860px) {
+  :root { --pad: 10px; }
+
+  body {
+    display: block;
+  }
+
+  .app {
+    flex-direction: column;
+    height: auto;
+    gap: 16px;
+  }
+
+  .game {
+    flex: none;  /* otherwise flex sizing ignores the height below */
+    height: calc(100vh - 2 * var(--pad) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100dvh - 2 * var(--pad) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    min-height: 420px;
+  }
+
+  .hud {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "score stats"
+      "hunger hunger"
+      "food food"
+      "effects effects";
+    font-size: 14px;
+  }
+  .hud-stats { justify-content: flex-end; gap: 16px; }
+  .hud-hunger { justify-content: flex-start; }
+  .bar { flex: 1; width: auto; }
+  .hud-effects { justify-content: flex-start; }
+  .pill { width: 140px; }
+
+  .rules {
+    width: auto;
+    overflow: visible;
+  }
+  .rules-link { display: block; width: fit-content; margin: 12px auto 0; }
+}
+
+/* Phones held sideways: arrow buttons go beside the board, scoreboard stays compact */
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
+  .game {
+    min-height: 280px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas:
+      "hud hud"
+      "board dpad";
+  }
+  .hud {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "score food hunger"
+      "stats stats effects";
+    max-width: none;
+    font-size: 13px;
+  }
+  .bar { flex: none; width: 140px; }
+  .hud-hunger { justify-content: flex-end; }
+  .hud-effects { justify-content: flex-end; }
+  .pill { width: 120px; }
+  .dpad { align-self: center; }
+}

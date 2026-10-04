@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0D131A">
+  <meta name="description" content="A snake game where every apple is a mystery. Plays on phones and computers.">
+  <title>MJY Snake</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='11' r='8' fill='%23E8453C'/%3E%3Cpath d='M10 4 L11 1' stroke='%237A5230' stroke-width='1.6'/%3E%3Cellipse cx='14' cy='3' rx='3.5' ry='1.6' fill='%235DBB63'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <section class="game" aria-label="Game">
+      <header class="hud">
+        <div class="hud-score"><span class="label">SCORE</span> <b id="score">0</b></div>
+        <div class="hud-food empty" id="last-food">
+          <canvas class="apple-icon" id="last-food-icon" width="20" height="20"></canvas>
+          <span id="last-food-text"></span>
+        </div>
+        <div class="hud-hunger">
+          <span class="label" id="hunger-label">HUNGER</span>
+          <span class="bar"><span class="bar-fill" id="hunger-fill"></span></span>
+        </div>
+        <div class="hud-stats">
+          <span><span class="label">LENGTH</span> <b id="length">3</b></span>
+          <span><span class="label">SPEED</span> <b id="speed">1.00x</b></span>
+        </div>
+        <div class="hud-effects">
+          <span class="pill" id="pill-reversed" hidden>
+            <span class="pill-fill"></span><span class="pill-text"></span>
+          </span>
+          <span class="pill" id="pill-drunk" hidden>
+            <span class="pill-fill"></span><span class="pill-text"></span>
+          </span>
+        </div>
+      </header>
+
+      <div class="board-wrap" id="board-wrap">
+        <canvas id="board" aria-label="Snake board"></canvas>
+
+        <div class="overlay" id="overlay">
+          <div class="panel">
+            <h1 id="overlay-title">MJY SNAKE</h1>
+            <p class="reason" id="overlay-reason"></p>
+            <p class="stats" id="overlay-stats"></p>
+            <button type="button" class="play" id="play-button">Play</button>
+            <p class="hint" id="overlay-hint"></p>
+            <a class="rules-link" href="#rules">How to play &darr;</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="dpad" aria-label="Arrow buttons">
+        <button type="button" data-dir="up" aria-label="Up">&#9650;</button>
+        <button type="button" data-dir="left" aria-label="Left">&#9664;</button>
+        <button type="button" data-dir="down" aria-label="Down">&#9660;</button>
+        <button type="button" data-dir="right" aria-label="Right">&#9654;</button>
+        <button type="button" class="pause" id="pause-button" aria-label="Pause">&#10074;&#10074;</button>
+      </div>
+    </section>
+
+    <aside class="rules" id="rules">
+      <h2>HOW TO PLAY</h2>
+
+      <h3>CONTROLS</h3>
+      <p>
+        <span class="keys-only">Steer with the arrow keys (or WASD). P pauses.</span>
+        <span class="touch-only">Swipe on the board or use the arrow buttons to steer.</span>
+        Hit a wall or your own body and the game is over.
+      </p>
+
+      <h3>HUNGER</h3>
+      <p>Your snake is always hungry and keeps shrinking, and the longer it is, the faster it
+        shrinks. When the hunger bar fills up, you lose a segment.</p>
+      <p class="danger">If your snake shrinks down to nothing, it starves to death.</p>
+
+      <h3>FOOD</h3>
+      <p>There are always <span data-setting="foodCount"></span> apples on the board and they all
+        look the same. You only find out what you ate afterwards, next to your score. Every apple
+        is worth 1 point.</p>
+
+      <div class="food-rule">
+        <canvas class="apple-icon" data-apple="normal" width="20" height="20"></canvas>
+        <div>
+          <h4 class="normal">NORMAL</h4>
+          <p>Grow 1 segment and speed up 5%.</p>
+        </div>
+      </div>
+      <div class="food-rule">
+        <canvas class="apple-icon" data-apple="benefit" width="20" height="20"></canvas>
+        <div>
+          <h4 class="benefit">BENEFIT</h4>
+          <p>One of these at random: slow down 10%, or grow 2 segments.</p>
+        </div>
+      </div>
+      <div class="food-rule">
+        <canvas class="apple-icon" data-apple="bad" width="20" height="20"></canvas>
+        <div>
+          <h4 class="bad">BAD</h4>
+          <p>One of these at random:</p>
+          <ul>
+            <li>Speed up 20%</li>
+            <li>Lose <span data-setting="badShrink"></span> segments (never below <span data-setting="shrinkFloor"></span>)</li>
+            <li>Reversed controls for <span data-setting="effectTime"></span> seconds</li>
+            <li>Drunk for <span data-setting="effectTime"></span> seconds: every turn happens
+              <span data-setting="drunkDelay"></span>s late</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>GOOD TO KNOW</h3>
+      <p>Reversed and drunk show a countdown above the board. Speed always stays between
+        <span data-setting="minSpeed"></span>x and <span data-setting="maxSpeed"></span>x.</p>
+    </aside>
+  </main>
+
+  <script src="logic.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
