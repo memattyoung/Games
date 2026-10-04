@@ -251,6 +251,33 @@ body {
 }
 .reason:empty, .stats:empty, .breakdown:empty, .hint:empty { display: none; }
 
+.modes {
+  display: inline-flex;
+  gap: 2px;
+  margin-top: 16px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--track);
+}
+.mode {
+  padding: 7px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--dim);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.mode[aria-checked="true"] {
+  background: var(--border);
+  color: var(--text);
+}
+.mode:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.modes + .play { display: block; margin: 14px auto 0; }
+
 .play {
   margin-top: 18px;
   padding: 12px 36px;
@@ -379,6 +406,14 @@ body {
 .food-rule .apple-icon { margin-top: 1px; }
 
 .touch-only { display: none; }
+
+/* Classic mode: plain snake, so the rules and scoreboard only show what it uses */
+body.classic .rules-rage,
+body:not(.classic) .rules-classic { display: none; }
+body.classic .hud-hunger,
+body.classic .hud-food,
+body.classic .hud-effects { visibility: hidden; }
+.rules .hint-text { margin-top: 10px; color: var(--dim); }
 
 /* ---------- Touch screens ---------- */
 

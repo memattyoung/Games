@@ -231,6 +231,20 @@ for (let seed = 0; seed < 40; seed++) {
 }
 console.log("random games OK", endings);
 
+// Classic mode: one apple, always normal, +1 point, a little faster, no hunger or rainbow apple
+g = new SnakeGame(30, 30, { classic: true });
+assert.strictEqual(g.foods.length, 1); assert.strictEqual(g.nextJackpotAt, Infinity);
+g.foods[0] = { x: g.segments[0].x + 1, y: g.segments[0].y, type: "normal" };
+g.step();
+assert.strictEqual(g.score, 1); assert.strictEqual(len(g), 4); assert.ok(Math.abs(g.speed - 1.03) < 1e-9);
+assert.strictEqual(g.foods.length, 1); assert.strictEqual(g.foods[0].type, "normal");
+g.foods[0] = { x: g.segments[0].x + 1, y: g.segments[0].y, type: "normal" };
+g.step(); assert.strictEqual(g.score, 2, "no combos in classic"); assert.strictEqual(g.comboLeft(), 0);
+g.nextMoveAt = 1e9; g.update(300);
+assert.strictEqual(len(g), 5, "no shrinking in classic"); assert.strictEqual(g.over, null); assert.strictEqual(g.jackpot, null);
+for (let i = 0; i < 200; i++) { g.foods[0] = null; g.foods[0] = g.newFood(); assert.strictEqual(g.foods[0].type, "normal"); }
+console.log("classic mode OK");
+
 // A completely full board doesn't hang
 g = emptyGame(12, 12); g.segments = [];
 for (let x = 0; x < 12; x++) for (let y = 0; y < 12; y++) g.segments.push({ x, y });

@@ -7,7 +7,15 @@ Matt Young presents **Rage Quit Snake**.
 Snake, with a twist: every apple looks the same, but some help you and some don't.
 You only find out what you ate after you eat it.
 
-## How to play
+## Two modes
+
+Pick a mode on the start screen. Each mode keeps its own best score.
+
+- **Rage Quit:** the chaos described below.
+- **Classic:** plain old snake. One apple at a time, each worth 1 point and 1 segment, and each
+  one makes you 3% faster. No hunger, no surprises.
+
+## How to play (Rage Quit)
 
 - **Computer:** steer with the arrow keys or WASD. P pauses, Space starts.
 - **Phone:** swipe on the board, or use the arrow buttons under it.

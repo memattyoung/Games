@@ -41,6 +41,10 @@
             <p class="reason" id="overlay-reason"></p>
             <p class="stats" id="overlay-stats"></p>
             <p class="breakdown" id="overlay-breakdown"></p>
+            <div class="modes" id="modes" role="radiogroup" aria-label="Game mode">
+              <button type="button" class="mode" role="radio" data-mode="rage">Rage Quit</button>
+              <button type="button" class="mode" role="radio" data-mode="classic">Classic</button>
+            </div>
             <button type="button" class="play" id="play-button">Play</button>
             <p class="hint" id="overlay-hint"></p>
             <a class="rules-link" href="#rules">How to play &darr;</a>
@@ -64,9 +68,18 @@
       <p>
         <span class="keys-only">Steer with the arrow keys (or WASD). P pauses.</span>
         <span class="touch-only">Swipe on the board or use the arrow buttons to steer.</span>
-        Hit a wall, a rock or your own body and the game is over.
+        <span class="rules-rage">Hit a wall, a rock or your own body and the game is over.</span>
+        <span class="rules-classic">Hit a wall or your own body and the game is over.</span>
       </p>
 
+      <div class="rules-classic">
+        <h3>CLASSIC MODE</h3>
+        <p>Plain old snake. There's one apple at a time: eat it to grow 1 segment and score 1 point.
+          Each apple makes you <span data-setting="classicSpeedUp"></span>% faster.</p>
+        <p class="hint-text">Want chaos? Pick Rage Quit on the start screen.</p>
+      </div>
+
+      <div class="rules-rage">
       <h3>HUNGER</h3>
       <p>Your snake is always hungry and keeps shrinking, and the longer it is, the faster it
         shrinks. When the hunger bar fills up, you lose a segment.</p>
@@ -130,6 +143,8 @@
         reversed, and see-through as a ghost. It flashes when an effect is about to wear off.
         Speed always stays between <span data-setting="minSpeed"></span>x and
         <span data-setting="maxSpeed"></span>x.</p>
+      <p class="hint-text">Want plain snake? Pick Classic on the start screen.</p>
+      </div>
     </aside>
   </main>
 

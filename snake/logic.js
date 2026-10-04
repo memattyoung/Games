@@ -22,6 +22,7 @@ const SETTINGS = {
   jackpotTime: 5,       // how long the rainbow apple stays, in seconds
   jackpotGapMin: 20,    // the rainbow apple shows up this many seconds after the last one...
   jackpotGapMax: 40,    // ...up to this many
+  classicSpeedUp: 3,    // in Classic mode, each apple makes you this much faster (percent)
 };
 
 const NORMAL = "normal";
@@ -36,9 +37,11 @@ const STEP = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 const MAX_QUEUED_TURNS = 4;
 
 class SnakeGame {
-  constructor(cols, rows, random = Math.random) {
+  // Classic mode is plain snake: one apple at a time, no hunger and none of the crazy rules
+  constructor(cols, rows, { classic = false, random = Math.random } = {}) {
     this.cols = cols;
     this.rows = rows;
+    this.classic = classic;
     this.random = random;
     this.time = 0;          // game clock in seconds; it only runs while the game is being played
     this.events = [];       // things that happened, for the screen to react to (popups etc.)
@@ -73,10 +76,10 @@ class SnakeGame {
     this.eaten = { normal: 0, benefit: 0, bad: 0, jackpot: 0 };
 
     this.jackpot = null;     // the rainbow apple, when it's on the board: { x, y, until }
-    this.nextJackpotAt = this.jackpotGap();
+    this.nextJackpotAt = classic ? Infinity : this.jackpotGap();
 
     this.foods = [];
-    for (let i = 0; i < SETTINGS.foodCount; i++) {
+    for (let i = 0; i < (classic ? 1 : SETTINGS.foodCount); i++) {
       this.foods.push(this.newFood());
     }
   }
@@ -163,6 +166,7 @@ class SnakeGame {
   }
 
   getHungry(dt) {
+    if (this.classic) return;
     // The longer the snake, the faster it gets hungry
     this.hunger += (dt * this.segments.length) / SETTINGS.shrinkTime;
     if (this.hunger < 1) return;
@@ -199,7 +203,7 @@ class SnakeGame {
   newFood() {
     const cell = this.randomFreeCell();
     if (!cell) return null;
-    const type = FOOD_TYPES[Math.floor(this.random() * FOOD_TYPES.length)];
+    const type = this.classic ? NORMAL : FOOD_TYPES[Math.floor(this.random() * FOOD_TYPES.length)];
     return { x: cell.x, y: cell.y, type };
   }
 
@@ -216,6 +220,10 @@ class SnakeGame {
   }
 
   addPoints(base) {
+    if (this.classic) {
+      this.score += base;
+      return base;
+    }
     // Eating again within comboTime seconds grows the combo multiplier
     this.combo = this.time < this.comboUntil ? Math.min(this.combo + 1, SETTINGS.maxCombo) : 1;
     this.comboUntil = this.time + SETTINGS.comboTime;
@@ -229,6 +237,12 @@ class SnakeGame {
   }
 
   applyFood(type, at) {
+    if (this.classic) {
+      this.grow(1);
+      this.changeSpeed(SETTINGS.classicSpeedUp);
+      return { text: "", popup: "+1" };
+    }
+
     if (type === NORMAL) {
       this.grow(1);
       this.changeSpeed(5);

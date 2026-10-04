@@ -55,6 +55,7 @@ const POPUP_TIME = 0.9;
 const FLASH_TIME = 2;      // effects flash on and off for their last 2 seconds
 const SWIPE_DISTANCE = 24;
 const BEST_KEY = "mjy-snake-best";  // kept from the old name so saved best scores still load
+const MODE_KEY = "mjy-snake-mode";
 const HEAD_ANGLE = { up: 0, right: Math.PI / 2, down: Math.PI, left: -Math.PI / 2 };
 const KEY_DIRECTIONS = {
   ArrowUp: "up", KeyW: "up",
@@ -80,6 +81,7 @@ let rows = FULL_ROWS;
 let cell = 20;            // size of one grid cell in CSS pixels
 let background = null;    // the checkerboard, drawn once whenever the board is resized
 let popups = [];
+let gameMode = loadSetting(MODE_KEY) === "classic" ? "classic" : "rage";  // "rage" or "classic"
 let best = loadBest();
 let lastFrame = performance.now();
 
@@ -112,20 +114,33 @@ function showing(timeLeft, now) {
   return timeLeft > FLASH_TIME || Math.floor(now / 150) % 2 === 0;
 }
 
-function loadBest() {
+function loadSetting(key) {
   try {
-    return Number(localStorage.getItem(BEST_KEY)) || 0;
+    return localStorage.getItem(key);
   } catch {
-    return 0;  // storage can be blocked, e.g. in private browsing
+    return null;  // storage can be blocked, e.g. in private browsing
   }
 }
 
-function saveBest(score) {
+function saveSetting(key, value) {
   try {
-    localStorage.setItem(BEST_KEY, String(score));
+    localStorage.setItem(key, String(value));
   } catch {
-    // not being able to save the best score isn't worth stopping the game for
+    // not being able to save isn't worth stopping the game for
   }
+}
+
+// Each mode keeps its own best score
+function bestKey() {
+  return gameMode === "classic" ? BEST_KEY + "-classic" : BEST_KEY;
+}
+
+function loadBest() {
+  return Number(loadSetting(bestKey())) || 0;
+}
+
+function saveBest(score) {
+  saveSetting(bestKey(), score);
 }
 
 // ---------- Board size ----------
@@ -551,11 +566,12 @@ function showOverlay(kind) {
   const keyHint = isTouch ? "" : "or press Space";
   setText($("overlay-eyebrow"), kind === "start" ? "MATT YOUNG PRESENTS" : "");
   setText($("overlay-breakdown"), "");
+  $("modes").hidden = kind === "paused";  // the mode can only change between games
 
   if (kind === "start") {
     setText($("overlay-title"), "RAGE QUIT SNAKE");
     setText($("overlay-reason"), "");
-    setText($("overlay-stats"), "Every apple is a mystery.");
+    setText($("overlay-stats"), gameMode === "classic" ? "Plain old snake. No surprises." : "Every apple is a mystery.");
     setText(playButton, "Play");
     setText($("overlay-hint"), isTouch ? "Swipe on the board or use the arrows to steer" : "or press Space");
   } else if (kind === "paused") {
@@ -575,8 +591,10 @@ function showOverlay(kind) {
     setText($("overlay-reason"), game.over);
     setText($("overlay-stats"),
       `Score ${game.score}  ·  Longest ${game.longest}  ·  ` + (newBest ? "New best!" : `Best ${best}`));
-    setText($("overlay-breakdown"),
-      `Ate ${ate.normal} normal · ${ate.benefit} benefit · ${ate.bad} bad · ${ate.jackpot} rainbow`);
+    if (!game.classic) {
+      setText($("overlay-breakdown"),
+        `Ate ${ate.normal} normal · ${ate.benefit} benefit · ${ate.bad} bad · ${ate.jackpot} rainbow`);
+    }
     setText(playButton, "Play again");
     setText($("overlay-hint"), keyHint);
   }
@@ -584,10 +602,25 @@ function showOverlay(kind) {
 
 function newGame() {
   [cols, rows] = chooseGrid();
-  game = new SnakeGame(cols, rows);
+  game = new SnakeGame(cols, rows, { classic: gameMode === "classic" });
   popups = [];
   resizeCanvas();
   hud.lastFood.classList.add("empty");
+}
+
+function setMode(newMode) {
+  gameMode = newMode;
+  saveSetting(MODE_KEY, newMode);
+  best = loadBest();
+  document.body.classList.toggle("classic", newMode === "classic");
+  for (const button of document.querySelectorAll(".mode")) {
+    button.setAttribute("aria-checked", String(button.dataset.mode === newMode));
+  }
+  // On the start screen, show a fresh board for the new mode behind the panel
+  if (mode === "start") {
+    newGame();
+    showOverlay("start");
+  }
 }
 
 function startGame() {
@@ -622,7 +655,7 @@ function addPopup(spot, text, color, row = 0) {
 function handleEvents() {
   for (const event of game.events) {
     if (event.type === "ate") {
-      showLastFood(event.food, event.text);
+      if (!game.classic) showLastFood(event.food, event.text);
       addPopup(event, event.popup, TYPE_COLORS[event.food]);
       if (event.combo >= 2) addPopup(event, `COMBO ×${event.combo}`, COLORS.gold, 1);
     } else if (event.type === "lost") {
@@ -694,6 +727,9 @@ $("pause-button").addEventListener("click", () => {
   else resume();
 });
 playButton.addEventListener("click", primaryAction);
+for (const button of document.querySelectorAll(".mode")) {
+  button.addEventListener("click", () => setMode(button.dataset.mode));
+}
 
 // Pause if you switch tabs, lock your phone or click away from the window
 document.addEventListener("visibilitychange", () => {
@@ -725,6 +761,5 @@ for (const icon of document.querySelectorAll("canvas[data-apple]")) {
   paintIcon(icon, icon.dataset.apple);
 }
 
-newGame();  // a fresh board sits behind the start screen
-showOverlay("start");
+setMode(gameMode);  // also puts a fresh board behind the start screen
 requestAnimationFrame(frame);
