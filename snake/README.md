@@ -58,6 +58,9 @@ can be played in a browser and on phones.
 | `logic.test.js` | Tests for the rules: `node logic.test.js` |
 | `python/` | The original Python version |
 
+When you change `style.css`, `logic.js` or `game.js`, bump the `?v=` number on them in `index.html`.
+Otherwise browsers can keep using the old files for a few minutes and the game breaks.
+
 ### Running the Python version
 
 It needs Python 3 with Tk (included with the python.org installers):
