@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0D131A">
+  <meta name="description" content="Matt Young presents Chaos Swarm: an alien-wave shooter where every capsule is a mystery and the swarm has opinions about you.">
+  <title>Chaos Swarm</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cellipse cx='10' cy='8' rx='7' ry='5.5' fill='%233FD0C9'/%3E%3Ccircle cx='7.5' cy='7.5' r='1.6' fill='%23fff'/%3E%3Ccircle cx='12.5' cy='7.5' r='1.6' fill='%23fff'/%3E%3Cpath d='M5 18 L10 13 L15 18 Z' fill='%237BD65B'/%3E%3C/svg%3E">
+  <!-- Bump ?v= whenever style.css, logic.js or game.js change, so browsers never mix old and new files -->
+  <link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+  <main class="app">
+    <section class="game" aria-label="Game">
+      <header class="hud">
+        <div class="hud-stats">
+          <span><span class="label">SCORE</span> <b id="score">0</b></span>
+          <span><span class="label">WAVE</span> <b id="wave">1</b></span>
+          <span><span class="label">LIVES</span> <b class="hearts" id="lives"></b></span>
+        </div>
+        <div class="hud-wall">
+          <span class="label" id="swarm-label">SWARM</span>
+          <span class="bar"><span class="bar-fill" id="swarm-fill"></span></span>
+          <button type="button" class="pause" id="pause-button" aria-label="Pause">&#10074;&#10074;</button>
+        </div>
+        <div class="hud-food empty" id="last-capsule">
+          <canvas class="capsule-icon" id="last-capsule-icon" width="26" height="14"></canvas>
+          <span id="last-capsule-text"></span>
+        </div>
+      </header>
+
+      <!-- One countdown pill per active effect; game.js fills this in -->
+      <div class="hud-effects" id="effects"></div>
+
+      <div class="board-wrap" id="board-wrap">
+        <canvas id="board" aria-label="Alien swarm board"></canvas>
+
+        <div class="overlay" id="overlay">
+          <div class="panel">
+            <p class="eyebrow" id="overlay-eyebrow">MATT YOUNG PRESENTS</p>
+            <h1 id="overlay-title">CHAOS SWARM</h1>
+            <p class="reason" id="overlay-reason"></p>
+            <p class="stats" id="overlay-stats"></p>
+            <p class="breakdown" id="overlay-taunt"></p>
+            <div class="modes" id="modes" role="radiogroup" aria-label="Game mode">
+              <button type="button" class="mode" role="radio" data-mode="rage">Chaos</button>
+              <button type="button" class="mode" role="radio" data-mode="classic">Classic</button>
+            </div>
+            <button type="button" class="play" id="play-button">Play</button>
+            <p class="hint" id="overlay-hint"></p>
+            <a class="menu-link" id="menu-link" href="../">&larr; Rage Quit Menu</a>
+            <a class="rules-link" href="#rules">How to play &darr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="rules" id="rules">
+      <h2>HOW TO PLAY</h2>
+
+      <h3>CONTROLS</h3>
+      <p>
+        <span class="keys-only">Move with your mouse or the arrow keys (or A and D). Hold Space or the
+          mouse button to shoot. P pauses.</span>
+        <span class="touch-only">Drag anywhere to move. Your ship shoots by itself, because we both
+          know you'd forget.</span>
+      </p>
+
+      <div class="rules-classic">
+        <h3>CLASSIC MODE</h3>
+        <p>Plain old wave shooter. The swarm marches back and forth and creeps down. Shoot them all before
+          they land, and dodge what they throw at you. Some of them get brave and dive at you. You get
+          <span data-setting="lives"></span> lives. No capsules, no boss, no combos, no nonsense.</p>
+        <p class="hint-text">Want chaos? Pick Chaos on the start screen.</p>
+      </div>
+
+      <div class="rules-rage">
+        <h3>THE BASICS</h3>
+        <p>The swarm marches side to side and drops a row every time it hits an edge. The fewer of them
+          there are, the faster they go. Clear the whole swarm and a meaner one shows up. You get
+          <span data-setting="lives"></span> lives.</p>
+        <p class="danger">If the swarm reaches the red line, it has landed and you lose. Even with lives left.
+          The SWARM bar shows how close they are.</p>
+
+        <h3>DIVE BOMBERS</h3>
+        <p>Every so often one of them gets brave, breaks formation and dives straight at you. Shoot it for
+          double points, or dodge it and watch it fly home embarrassed.</p>
+
+        <h3>POINTS</h3>
+        <p>Bottom row 10, middle 20, top row 30. Every <span data-setting="comboStep"></span> kills in a row
+          without missing grows your multiplier: &times;2, &times;3&hellip; up to
+          &times;<span data-setting="maxMultiplier"></span>. Miss once and it's gone. Clearing a wave gets
+          you a bonus.</p>
+        <p>Now and then a <b class="jackpot">rainbow boss</b> floats across the top wearing sunglasses. Hit it
+          <span data-setting="bossHp"></span> times for <span data-setting="bossPoints"></span> points (times
+          your multiplier).</p>
+
+        <h3>MYSTERY CAPSULES</h3>
+        <div class="food-rule">
+          <canvas class="capsule-icon" data-capsule="mystery" width="26" height="14"></canvas>
+          <p>Dead aliens sometimes drop a capsule. They all look the same. Fly into one to find out if
+            it's a gift or a prank.</p>
+        </div>
+        <div class="food-rule">
+          <canvas class="capsule-icon" data-capsule="good" width="26" height="14"></canvas>
+          <div>
+            <h4 class="good">GOOD (one of these)</h4>
+            <ul>
+              <li>Spread shot for <span data-setting="effectTime"></span> seconds</li>
+              <li>Rapid fire for <span data-setting="effectTime"></span> seconds</li>
+              <li>Piercing laser for <span data-setting="effectTime"></span> seconds: shots go through them</li>
+              <li>Slow swarm for <span data-setting="effectTime"></span> seconds</li>
+              <li>Shield: takes one hit for you</li>
+              <li>An extra life (rare)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="food-rule">
+          <canvas class="capsule-icon" data-capsule="bad" width="26" height="14"></canvas>
+          <div>
+            <h4 class="bad">BAD (one of these)</h4>
+            <ul>
+              <li>Reversed controls for <span data-setting="effectTime"></span> seconds</li>
+              <li>Drunk ship: it lags <span data-setting="drunkDelay"></span>s behind you for
+                <span data-setting="effectTime"></span> seconds</li>
+              <li>Jammed gun for <span data-setting="effectTime"></span> seconds</li>
+              <li>Fog for <span data-setting="fogTime"></span> seconds: you can only see near your ship</li>
+              <li>The swarm speeds up for <span data-setting="effectTime"></span> seconds</li>
+              <li>Boomerang bullets for <span data-setting="effectTime"></span> seconds: misses come back down
+                at you</li>
+              <li>The swarm learns to dodge for <span data-setting="dodgeTime"></span> seconds</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>GOOD TO KNOW</h3>
+        <p>Your ship turns <b class="bad">purple</b> when drunk and <b class="reversed">orange</b> when
+          reversed, and flashes when an effect is about to wear off. You blink for a couple of seconds after
+          getting hit, and nothing can touch you while you do. You don't have to catch capsules. Sometimes
+          the smart move is to let it fall.</p>
+        <p class="hint-text">Want plain old aliens? Pick Classic on the start screen.</p>
+      </div>
+    </aside>
+  </main>
+
+  <script src="logic.js?v=1"></script>
+  <script src="game.js?v=1"></script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0D131A">
+  <meta name="description" content="Matt Young presents Chaos Paddle: a paddle duel against Kevin, a trash-talking computer, with mystery orbs that make everything worse.">
+  <title>Chaos Paddle</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect x='4' y='2' width='12' height='2.5' rx='1.2' fill='%235CC2FF'/%3E%3Ccircle cx='10' cy='10' r='2.4' fill='%23fff'/%3E%3Crect x='4' y='15.5' width='12' height='2.5' rx='1.2' fill='%237BD65B'/%3E%3C/svg%3E">
+  <!-- Bump ?v= whenever style.css, logic.js or game.js change, so browsers never mix old and new files -->
+  <link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+  <main class="app">
+    <section class="game" aria-label="Game">
+      <header class="hud">
+        <div class="hud-stats">
+          <span><span class="label">YOU</span> <b id="score-player">0</b></span>
+          <span><span class="label">KEVIN</span> <b class="kevin" id="score-cpu">0</b></span>
+          <span><span class="label">STREAK</span> <b id="streak">0</b></span>
+        </div>
+        <div class="hud-right">
+          <span class="label first-to">FIRST TO <span data-setting="winScore"></span></span>
+          <button type="button" class="pause" id="pause-button" aria-label="Pause">&#10074;&#10074;</button>
+        </div>
+        <div class="hud-food empty" id="last-orb">
+          <canvas class="orb-icon" id="last-orb-icon" width="16" height="16"></canvas>
+          <span id="last-orb-text"></span>
+        </div>
+      </header>
+
+      <!-- One countdown pill per active effect; game.js fills this in -->
+      <div class="hud-effects" id="effects"></div>
+
+      <div class="board-wrap" id="board-wrap">
+        <canvas id="board" aria-label="Paddle court"></canvas>
+
+        <div class="overlay" id="overlay">
+          <div class="panel">
+            <p class="eyebrow" id="overlay-eyebrow">MATT YOUNG PRESENTS</p>
+            <h1 id="overlay-title">CHAOS PADDLE</h1>
+            <p class="reason" id="overlay-reason"></p>
+            <p class="stats" id="overlay-stats"></p>
+            <p class="breakdown" id="overlay-taunt"></p>
+            <div class="modes" id="modes" role="radiogroup" aria-label="Game mode">
+              <button type="button" class="mode" role="radio" data-mode="rage">Chaos</button>
+              <button type="button" class="mode" role="radio" data-mode="classic">Classic</button>
+            </div>
+            <button type="button" class="play" id="play-button">Play</button>
+            <p class="hint" id="overlay-hint"></p>
+            <a class="menu-link" id="menu-link" href="../">&larr; Rage Quit Menu</a>
+            <a class="rules-link" href="#rules">How to play &darr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="rules" id="rules">
+      <h2>HOW TO PLAY</h2>
+
+      <h3>CONTROLS</h3>
+      <p>
+        <span class="keys-only">Move your paddle with the mouse, or the arrow keys (or A and D). P pauses.</span>
+        <span class="touch-only">Drag anywhere and your paddle follows your finger. There's room under the
+          court for your thumb.</span>
+        You're at the bottom. The smug one at the top is Kevin.
+      </p>
+
+      <h3>THE MATCH</h3>
+      <p>First to <span data-setting="winScore"></span> points wins. Get the ball past Kevin's paddle to score,
+        and don't let it past yours. Where the ball hits your paddle decides where it goes, so use the
+        ends to send it flying into the corners.</p>
+      <p>The longer a rally goes, the faster the ball gets. Beat Kevin and you go straight into the next
+        match, where he's faster and sharper. Your best score is your longest <b>win streak</b>.</p>
+      <p class="danger">Kevin talks trash. He is a computer. Do not take it personally.</p>
+
+      <div class="rules-classic">
+        <h3>CLASSIC MODE</h3>
+        <p>Just you, Kevin and one ball. No orbs, no nonsense. Kevin still has opinions, though.</p>
+        <p class="hint-text">Want chaos? Pick Chaos on the start screen.</p>
+      </div>
+
+      <div class="rules-rage">
+        <h3>MYSTERY ORBS</h3>
+        <div class="food-rule">
+          <canvas class="orb-icon" data-orb="mystery" width="16" height="16"></canvas>
+          <p>Orbs keep popping up in the middle of the court. They all look the same. When the ball hits
+            one, whoever touched the ball last gets what's inside. Yes, Kevin too.</p>
+        </div>
+        <div class="food-rule">
+          <canvas class="orb-icon" data-orb="good" width="16" height="16"></canvas>
+          <div>
+            <h4 class="good">GOOD (one of these)</h4>
+            <ul>
+              <li>Giant paddle for <span data-setting="effectTime"></span> seconds</li>
+              <li>Multiball: two extra balls, for everyone</li>
+              <li>Curveballs for <span data-setting="effectTime"></span> seconds: your shots bend</li>
+              <li>Slow-mo for <span data-setting="effectTime"></span> seconds: the ball slows down when it's coming at you</li>
+              <li>A shield behind your goal that saves one ball</li>
+            </ul>
+          </div>
+        </div>
+        <div class="food-rule">
+          <canvas class="orb-icon" data-orb="bad" width="16" height="16"></canvas>
+          <div>
+            <h4 class="bad">BAD (one of these)</h4>
+            <ul>
+              <li>Tiny paddle for <span data-setting="effectTime"></span> seconds</li>
+              <li>Reversed controls for <span data-setting="effectTime"></span> seconds</li>
+              <li>Drunk paddle: it lags <span data-setting="drunkDelay"></span>s behind for
+                <span data-setting="effectTime"></span> seconds</li>
+              <li>Fog for <span data-setting="shortTime"></span> seconds: you only see near the ball</li>
+              <li>Invisible ball for <span data-setting="shortTime"></span> seconds</li>
+              <li>The court tilts for <span data-setting="tiltTime"></span> seconds and the ball slides sideways</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>GOOD TO KNOW</h3>
+        <p>Your paddle turns <b class="bad">purple</b> when drunk and <b class="reversed">orange</b> when
+          reversed, and flashes when an effect is about to wear off. Kevin's paddle does the same, and
+          his effects are listed under his paddle so you can laugh at him.</p>
+        <p class="hint-text">Want a fair fight? Pick Classic on the start screen.</p>
+      </div>
+    </aside>
+  </main>
+
+  <script src="logic.js?v=1"></script>
+  <script src="game.js?v=1"></script>
+</body>
+</html>

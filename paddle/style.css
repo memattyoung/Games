@@ -63,7 +63,7 @@ body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
-    "stats wall"
+    "stats right"
     "food food";
   align-items: center;
   column-gap: 20px;
@@ -89,17 +89,17 @@ body {
   min-height: 20px;
 }
 .hud-food.empty { visibility: hidden; }
-#last-capsule-text { overflow: hidden; text-overflow: ellipsis; }
+#last-orb-text { overflow: hidden; text-overflow: ellipsis; }
 
-.hud-wall {
-  grid-area: wall;
+.hud-right {
+  grid-area: right;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
 }
-#wall-label.danger { color: var(--red); }
-.hearts { color: var(--red); letter-spacing: 1px; }
+.kevin { color: #5CC2FF; }
+.first-to { font-size: 12px; letter-spacing: 1px; }
 
 .pause {
   width: 30px;
@@ -114,22 +114,6 @@ body {
   touch-action: manipulation;
 }
 .pause:hover { color: var(--text); }
-
-.bar {
-  display: block;
-  width: 130px;
-  height: 16px;
-  padding: 2px;
-  border-radius: 8px;
-  background: var(--track);
-}
-.bar-fill {
-  display: block;
-  width: 0;
-  height: 100%;
-  border-radius: 6px;
-  background: var(--green);
-}
 
 .hud-stats {
   grid-area: stats;
@@ -182,9 +166,9 @@ body {
 .pill-gold { --pill-track: #3A3214; --pill-fill: #A88414; }
 .pill-green { --pill-track: #1C3320; --pill-fill: #3E9B3A; }
 
-.capsule-icon {
-  width: 26px;
-  height: 14px;
+.orb-icon {
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
 }
 
@@ -392,15 +376,13 @@ body {
   gap: 10px;
   margin: 8px 0;
 }
-.food-rule .capsule-icon { margin-top: 3px; }
+.food-rule .orb-icon { margin-top: 2px; }
 
 .touch-only { display: none; }
 
-/* Classic mode: plain brick breaker, so the rules and scoreboard only show what it uses */
+/* Classic mode: a plain duel, so the rules and scoreboard only show what it uses */
 body.classic .rules-rage,
 body:not(.classic) .rules-classic { display: none; }
-body.classic .hud-wall .label,
-body.classic .hud-wall .bar,
 body.classic .hud-food,
 body.classic .hud-effects { visibility: hidden; }
 .rules .hint-text { margin-top: 10px; color: var(--dim); }
@@ -434,17 +416,9 @@ body.classic .hud-effects { visibility: hidden; }
     min-height: 420px;
   }
 
-  .hud {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      "stats"
-      "wall"
-      "food";
-    font-size: 14px;
-  }
-  .hud-stats { justify-content: space-between; gap: 12px; }
-  .hud-wall { justify-content: flex-start; }
-  .bar { flex: 1; width: auto; }
+  .hud { font-size: 14px; }
+  .hud-stats { gap: 14px; }
+  .first-to { display: none; }
   .hud-effects { min-height: 50px; }
 
   .rules {
@@ -487,15 +461,9 @@ body.classic .hud-effects { visibility: hidden; }
       "board effects";
   }
   .hud {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-      "stats wall"
-      "food food";
     max-width: none;
     font-size: 13px;
   }
-  .bar { flex: none; width: 120px; }
-  .hud-wall { justify-content: flex-end; }
   .hud-effects { min-height: 0; max-width: none; align-content: flex-start; }
-  .board-wrap::after { display: none; }  /* no room for the drag hint under a sideways board */
+  .board-wrap::after { display: none; }  /* no room under the court for the drag hint */
 }

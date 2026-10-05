@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0D131A">
+  <meta name="description" content="Matt Young presents Chaos Sweeper: a bomb-finding puzzle where the numbers lie and the bombs move.">
+  <title>Chaos Sweeper</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='11.5' r='6.5' fill='%232A3140' stroke='%23FF4FA3' stroke-width='1.4'/%3E%3Cpath d='M7 9.5 L9 10.5 M13 9.5 L11 10.5' stroke='%23fff' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M12 5 Q14 2 16 3' stroke='%23F5C542' stroke-width='1.3' fill='none'/%3E%3C/svg%3E">
+  <!-- Bump ?v= whenever style.css, logic.js or game.js change, so browsers never mix old and new files -->
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+  <main class="app">
+    <section class="game" aria-label="Game">
+      <header class="hud">
+        <div class="hud-stats">
+          <span><span class="label">SCORE</span> <b id="score">0</b></span>
+          <span><span class="label">BOMBS</span> <b id="bombs">0</b></span>
+          <span><span class="label" id="clock-label">TIME</span> <b id="clock">0:00</b></span>
+        </div>
+        <button type="button" class="pause" id="pause-button" aria-label="Pause">&#10074;&#10074;</button>
+        <div class="hud-food empty" id="last-capsule">
+          <canvas class="capsule-icon" id="last-capsule-icon" width="26" height="14"></canvas>
+          <span id="last-capsule-text"></span>
+        </div>
+      </header>
+
+      <!-- One countdown pill per active effect; game.js fills this in -->
+      <div class="hud-effects" id="effects"></div>
+
+      <div class="board-wrap" id="board-wrap">
+        <canvas id="board" aria-label="Chaos Sweeper board"></canvas>
+
+        <div class="overlay" id="overlay">
+          <div class="panel">
+            <p class="eyebrow" id="overlay-eyebrow">MATT YOUNG PRESENTS</p>
+            <h1 id="overlay-title">CHAOS SWEEPER</h1>
+            <p class="reason" id="overlay-reason"></p>
+            <p class="stats" id="overlay-stats"></p>
+            <p class="breakdown" id="overlay-taunt"></p>
+            <div class="switches" id="switches">
+              <div class="modes" role="radiogroup" aria-label="Game mode">
+                <button type="button" class="mode" role="radio" data-mode="rage">Chaos</button>
+                <button type="button" class="mode" role="radio" data-mode="classic">Classic</button>
+              </div>
+              <div class="modes" role="radiogroup" aria-label="Board size">
+                <button type="button" class="mode" role="radio" data-size="easy">Easy</button>
+                <button type="button" class="mode" role="radio" data-size="normal">Normal</button>
+                <button type="button" class="mode" role="radio" data-size="hard">Hard</button>
+              </div>
+            </div>
+            <button type="button" class="play" id="play-button">Play</button>
+            <p class="hint" id="overlay-hint"></p>
+            <a class="menu-link" id="menu-link" href="../">&larr; Rage Quit Menu</a>
+            <a class="rules-link" href="#rules">How to play &darr;</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="tools">
+        <div class="tool-switch" role="radiogroup" aria-label="What a tap does">
+          <button type="button" class="tool" role="radio" data-tool="dig">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 L10 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 3 Q12 1 14 4 Q11 4 10 6 Q9 5 8 3 Z" fill="currentColor"/></svg>
+            Dig
+          </button>
+          <button type="button" class="tool" role="radio" data-tool="flag">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 14 L4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M5 2 L13 5 L5 8 Z" fill="currentColor"/></svg>
+            Flag
+          </button>
+        </div>
+        <span class="keys-only">F switches</span>
+        <span class="touch-only">or hold to flag</span>
+      </div>
+    </section>
+
+    <aside class="rules" id="rules">
+      <h2>HOW TO PLAY</h2>
+
+      <h3>CONTROLS</h3>
+      <p>
+        <span class="keys-only">Left click digs. Right click (or Shift+click) plants a flag. F flips the
+          Dig/Flag switch and P pauses.</span>
+        <span class="touch-only">Tap to dig, hold to plant a flag, or flip the Dig/Flag switch under the
+          board.</span>
+        Dig a number that already has enough flags around it and its other neighbours get dug for you.
+      </p>
+
+      <h3>THE BASICS</h3>
+      <p>Each number says how many bombs touch that square, diagonals included. Dig every square that
+        isn't a bomb to win. Dig a bomb and, well, you'll find out. Your first dig is always safe,
+        because I'm not a monster.</p>
+
+      <div class="rules-classic">
+        <h3>CLASSIC MODE</h3>
+        <p>Just bombs, numbers and a clock counting up. Nothing moves, nothing lies. Suspiciously calm.</p>
+        <p>1 point per square you dig (&times;2 on Normal, &times;3 on Hard). Win for a bonus, plus
+          <span data-setting="secondPoints"></span> points for every second you finish under par
+          (<span data-par="easy"></span> Easy, <span data-par="normal"></span> Normal,
+          <span data-par="hard"></span> Hard).</p>
+        <p class="hint-text">Want chaos? Pick Chaos on the start screen.</p>
+      </div>
+
+      <div class="rules-rage">
+        <h3>THE CLOCK</h3>
+        <p>You get <span data-par="easy"></span> on Easy, <span data-par="normal"></span> on Normal and
+          <span data-par="hard"></span> on Hard. It starts on your first dig. Run out and the bombs win by
+          forfeit.</p>
+        <p class="danger">Under <span data-setting="panicTime"></span> seconds the board starts to panic. So
+          will you.</p>
+
+        <h3>POINTS</h3>
+        <p>1 point per square you dig (&times;2 on Normal, &times;3 on Hard). Win for a
+          <span data-setting="winBonus"></span>-point bonus (times the same), plus
+          <span data-setting="secondPoints"></span> points for every second left on the clock.</p>
+
+        <h3>MYSTERY CAPSULES</h3>
+        <div class="food-rule">
+          <canvas class="capsule-icon" data-capsule="mystery" width="26" height="14"></canvas>
+          <p>Some safe squares hide a capsule. They all look the same. Dig one up to find out whose side
+            it's on.</p>
+        </div>
+        <div class="food-rule">
+          <canvas class="capsule-icon" data-capsule="good" width="26" height="14"></canvas>
+          <div>
+            <h4 class="good">GOOD (one of these)</h4>
+            <ul>
+              <li>Free flag: I flag a bomb for you</li>
+              <li>Free dig: a patch of safe squares gets dug for you</li>
+              <li>Time freeze for <span data-setting="freezeTime"></span> seconds</li>
+              <li>X-ray: see the bombs nearby for <span data-setting="xrayTime"></span> seconds. Blink and
+                you'll miss it.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="food-rule">
+          <canvas class="capsule-icon" data-capsule="bad" width="26" height="14"></canvas>
+          <div>
+            <h4 class="bad">BAD (one of these)</h4>
+            <ul>
+              <li>Shuffle: up to <span data-setting="shuffleCount"></span> bombs you haven't flagged move
+                somewhere new</li>
+              <li>Fog: the numbers vanish for <span data-setting="fogTime"></span> seconds</li>
+              <li>Liar: some numbers are off by one for <span data-setting="liarTime"></span> seconds. They
+                glitch, so you know.</li>
+              <li>Turbo clock: time runs double speed for <span data-setting="turboTime"></span> seconds</li>
+              <li>An extra bomb gets planted somewhere</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>GOOD TO KNOW</h3>
+        <p>Bombs never move into or out of a square you've flagged, so correct flags stay correct. When
+          bombs move, any numbers that changed flash yellow, and a number that drops to 0 digs its
+          neighbours for free. Digging while lies are flying is allowed. Brave, but allowed.</p>
+        <p class="hint-text">Want plain old bomb finding? Pick Classic on the start screen.</p>
+      </div>
+    </aside>
+  </main>
+
+  <script src="logic.js?v=2"></script>
+  <script src="game.js?v=2"></script>
+</body>
+</html>

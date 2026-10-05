@@ -248,7 +248,8 @@ class BrickGame {
   rideOnPaddle(ball) {
     const half = this.paddleWidth() / 2;
     ball.offset = clamp(ball.offset, -half + 4, half - 4);
-    ball.x = this.paddle.x + ball.offset;
+    // Keep it on the board even when the paddle is pressed right up against a wall
+    ball.x = clamp(this.paddle.x + ball.offset, SETTINGS.ballRadius, SETTINGS.width - SETTINGS.ballRadius);
     ball.y = SETTINGS.paddleY - SETTINGS.ballRadius - 0.5;
   }
 
@@ -382,6 +383,9 @@ class BrickGame {
       ball.vy = ball.vy < 0 ? -0.25 : 0.25;
       ball.vx = Math.sign(ball.vx || 1) * Math.sqrt(1 - 0.25 * 0.25);
     }
+    // Bricks touch the side walls, so pushing the ball out of one must never push it off the board
+    ball.x = clamp(ball.x, r, SETTINGS.width - r);
+    ball.y = Math.max(ball.y, r);
     return true;
   }
 

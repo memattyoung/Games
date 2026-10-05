@@ -63,7 +63,7 @@ body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
-    "stats wall"
+    "stats side"
     "food food";
   align-items: center;
   column-gap: 20px;
@@ -89,17 +89,15 @@ body {
   min-height: 20px;
 }
 .hud-food.empty { visibility: hidden; }
-#last-capsule-text { overflow: hidden; text-overflow: ellipsis; }
+#last-orb-text { overflow: hidden; text-overflow: ellipsis; }
 
-.hud-wall {
-  grid-area: wall;
+.hud-side {
+  grid-area: side;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
 }
-#wall-label.danger { color: var(--red); }
-.hearts { color: var(--red); letter-spacing: 1px; }
 
 .pause {
   width: 30px;
@@ -114,22 +112,6 @@ body {
   touch-action: manipulation;
 }
 .pause:hover { color: var(--text); }
-
-.bar {
-  display: block;
-  width: 130px;
-  height: 16px;
-  padding: 2px;
-  border-radius: 8px;
-  background: var(--track);
-}
-.bar-fill {
-  display: block;
-  width: 0;
-  height: 100%;
-  border-radius: 6px;
-  background: var(--green);
-}
 
 .hud-stats {
   grid-area: stats;
@@ -182,9 +164,9 @@ body {
 .pill-gold { --pill-track: #3A3214; --pill-fill: #A88414; }
 .pill-green { --pill-track: #1C3320; --pill-fill: #3E9B3A; }
 
-.capsule-icon {
-  width: 26px;
-  height: 14px;
+.orb-icon {
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
 }
 
@@ -198,7 +180,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  touch-action: none;   /* dragging moves the paddle instead of scrolling the page */
+  touch-action: none;   /* tapping flaps instead of scrolling or zooming the page */
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
@@ -392,15 +374,13 @@ body {
   gap: 10px;
   margin: 8px 0;
 }
-.food-rule .capsule-icon { margin-top: 3px; }
+.food-rule .orb-icon { margin-top: 1px; }
 
 .touch-only { display: none; }
 
-/* Classic mode: plain brick breaker, so the rules and scoreboard only show what it uses */
+/* Classic mode: the plain flyer, so the rules and scoreboard only show what it uses */
 body.classic .rules-rage,
 body:not(.classic) .rules-classic { display: none; }
-body.classic .hud-wall .label,
-body.classic .hud-wall .bar,
 body.classic .hud-food,
 body.classic .hud-effects { visibility: hidden; }
 .rules .hint-text { margin-top: 10px; color: var(--dim); }
@@ -435,16 +415,14 @@ body.classic .hud-effects { visibility: hidden; }
   }
 
   .hud {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
-      "stats"
-      "wall"
-      "food";
+      "stats side"
+      "food food";
     font-size: 14px;
   }
   .hud-stats { justify-content: space-between; gap: 12px; }
-  .hud-wall { justify-content: flex-start; }
-  .bar { flex: 1; width: auto; }
+  .hud-deaths .long { display: none; }
   .hud-effects { min-height: 50px; }
 
   .rules {
@@ -459,9 +437,10 @@ body.classic .hud-effects { visibility: hidden; }
   .board-wrap { align-items: flex-start; }
 }
 
-@media (hover: none) and (pointer: coarse) and (max-width: 860px) {
+/* Only on phones tall enough to have space under the board for it */
+@media (hover: none) and (pointer: coarse) and (max-width: 860px) and (orientation: portrait) and (min-height: 700px) {
   .board-wrap::after {
-    content: "\2190  drag anywhere to move  \2192";
+    content: "tap anywhere to flap";
     position: absolute;
     bottom: 6px;
     left: 0;
@@ -489,13 +468,10 @@ body.classic .hud-effects { visibility: hidden; }
   .hud {
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
-      "stats wall"
+      "stats side"
       "food food";
     max-width: none;
     font-size: 13px;
   }
-  .bar { flex: none; width: 120px; }
-  .hud-wall { justify-content: flex-end; }
   .hud-effects { min-height: 0; max-width: none; align-content: flex-start; }
-  .board-wrap::after { display: none; }  /* no room for the drag hint under a sideways board */
 }

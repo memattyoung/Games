@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" aria-hidden="true">
+  <defs>
+    <radialGradient id="nebula" cx="0.25" cy="0.3" r="0.6">
+      <stop offset="0" stop-color="#78C" stop-opacity="0.35"/><stop offset="1" stop-color="#0A1020" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rainbow" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#FF6B6B"/><stop offset="0.33" stop-color="#FFE14D"/>
+      <stop offset="0.66" stop-color="#5CC2FF"/><stop offset="1" stop-color="#B98AF0"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="140" fill="#070B12"/>
+  <rect width="320" height="140" fill="url(#nebula)"/>
+  <g fill="#FFFFFF" opacity="0.7">
+    <rect x="22" y="18" width="1.6" height="1.6"/><rect x="88" y="104" width="1.4" height="1.4"/><rect x="140" y="22" width="1.8" height="1.8"/>
+    <rect x="196" y="122" width="1.4" height="1.4"/><rect x="250" y="16" width="1.6" height="1.6"/><rect x="298" y="70" width="1.4" height="1.4"/>
+    <rect x="60" y="64" width="1.2" height="1.2"/><rect x="226" y="92" width="1.2" height="1.2"/><rect x="12" y="120" width="1.4" height="1.4"/>
+  </g>
+  <path d="M38 40 L56 26 L78 30 L88 50 L80 70 L58 76 L40 64 Z" fill="#A98BFF" stroke="#2E1F66" stroke-width="2"/>
+  <circle cx="58" cy="46" r="5" fill="#000" opacity="0.2"/><circle cx="72" cy="60" r="3.5" fill="#000" opacity="0.2"/>
+  <path d="M236 30 L252 22 L270 30 L272 48 L258 58 L240 52 Z" fill="url(#rainbow)" stroke="#5A3A10" stroke-width="1.5"/>
+  <path d="M120 96 L132 90 L144 96 L142 110 L128 114 L118 106 Z" fill="#5FE0D2" stroke="#124A45" stroke-width="1.5"/>
+  <path d="M286 104 L296 100 L304 108 L298 118 L288 116 Z" fill="#FF9A6B" stroke="#6A2A18" stroke-width="1.5"/>
+  <circle cx="200" cy="78" r="9" fill="#FFFFFF" stroke="#8090A0" stroke-width="1.2"/>
+  <text x="200" y="82.5" font-family="Arial" font-weight="900" font-size="12" text-anchor="middle" fill="#FF4FA3">?</text>
+  <circle cx="200" cy="78" r="14" fill="none" stroke="#FF4FA3" stroke-width="1.5" stroke-dasharray="3 4"/>
+  <g transform="translate(150 70) rotate(-25)">
+    <path d="M-30 0 L-44 -3 L-44 3 Z" fill="#FFB347"/>
+    <path d="M24 0 Q5 -6 -14 -16 L-8 -5 L-11 0 L-8 5 L-14 16 Q5 6 24 0 Z" fill="#C99CFF" stroke="#FFFFFF" stroke-opacity="0.6"/>
+    <rect x="-16" y="-10" width="4" height="20" fill="#FFBE6E"/><rect x="-6" y="-12" width="4" height="24" fill="#FFBE6E"/><rect x="4" y="-8" width="4" height="16" fill="#FFBE6E"/>
+    <ellipse cx="5" cy="0" rx="5" ry="3.5" fill="#FFFFFF" opacity="0.9"/>
+  </g>
+  <circle cx="186" cy="56" r="2.6" fill="#FFFFFF"/><circle cx="208" cy="44" r="2.6" fill="#FFFFFF"/>
+  <g transform="translate(112 24)">
+    <ellipse cx="0" cy="-4" rx="9" ry="8" fill="#A6F0FF" opacity="0.6"/>
+    <ellipse cx="0" cy="1" rx="20" ry="7" fill="#E0559C"/>
+    <circle cx="-10" cy="3" r="1.6" fill="#FFF3B0"/><circle cx="0" cy="4" r="1.6" fill="#FFF3B0"/><circle cx="10" cy="3" r="1.6" fill="#FFF3B0"/>
+  </g>
+  <text x="44" y="122" font-family="Arial" font-weight="900" font-size="14" fill="#F05A4F" stroke="#05070D" stroke-width="3" paint-order="stroke">HOUSTON, SKILL ISSUE</text>
+</svg>

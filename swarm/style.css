@@ -61,10 +61,11 @@ body {
 .hud {
   grid-area: hud;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
-    "stats wall"
-    "food food";
+    "stats"
+    "wall"
+    "food";
   align-items: center;
   column-gap: 20px;
   row-gap: 6px;
@@ -95,10 +96,10 @@ body {
   grid-area: wall;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 10px;
 }
-#wall-label.danger { color: var(--red); }
+#swarm-label.danger { color: var(--red); }
 .hearts { color: var(--red); letter-spacing: 1px; }
 
 .pause {
@@ -117,7 +118,8 @@ body {
 
 .bar {
   display: block;
-  width: 130px;
+  flex: 1;
+  width: auto;
   height: 16px;
   padding: 2px;
   border-radius: 8px;
@@ -198,7 +200,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  touch-action: none;   /* dragging moves the paddle instead of scrolling the page */
+  touch-action: none;   /* dragging moves the ship instead of scrolling the page */
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
@@ -396,11 +398,9 @@ body {
 
 .touch-only { display: none; }
 
-/* Classic mode: plain brick breaker, so the rules and scoreboard only show what it uses */
+/* Classic mode: a plain wave shooter, so the rules and scoreboard only show what it uses */
 body.classic .rules-rage,
 body:not(.classic) .rules-classic { display: none; }
-body.classic .hud-wall .label,
-body.classic .hud-wall .bar,
 body.classic .hud-food,
 body.classic .hud-effects { visibility: hidden; }
 .rules .hint-text { margin-top: 10px; color: var(--dim); }
@@ -497,5 +497,4 @@ body.classic .hud-effects { visibility: hidden; }
   .bar { flex: none; width: 120px; }
   .hud-wall { justify-content: flex-end; }
   .hud-effects { min-height: 0; max-width: none; align-content: flex-start; }
-  .board-wrap::after { display: none; }  /* no room for the drag hint under a sideways board */
 }
