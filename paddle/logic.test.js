@@ -8,7 +8,7 @@ const close = (a, b, why, within = 1e-6) => assert.ok(Math.abs(a - b) < within, 
 function run(game, seconds, step = 1 / 60) {
   for (let t = 0; t < seconds && !game.over; t += step) game.update(step);
 }
-// A game with a ball already flying, Kevin parked out of the way and no orbs
+// A game with a ball already flying, Tuna Marie parked out of the way and no orbs
 function flying(options = {}, ball = {}) {
   const g = new PaddleGame(options);
   g.nextOrbAt = 1e9;
@@ -28,7 +28,7 @@ assert.ok(Math.abs(g.balls[0].vx) < Math.abs(g.balls[0].vy), "serve isn't too si
 g = flying({}, { vy: -380 }); freezeCpu(g); g.paddles.player.x = 300;
 run(g, 1.5);
 assert.strictEqual(g.score.player, 1);
-assert.strictEqual(g.serveToward, "cpu", "Kevin lost the point, so he receives");
+assert.strictEqual(g.serveToward, "cpu", "Tuna Marie lost the point, so he receives");
 console.log("serving OK");
 
 // Side walls
@@ -45,10 +45,10 @@ assert.strictEqual(g.rally, 1); close(Math.hypot(ball.vx, ball.vy), 380 * 1.05, 
 g.rally = 100; close(g.ballSpeed(), 380 * 1.9, "speed is capped", 0.01);
 console.log("your paddle OK");
 
-// Kevin's paddle sends it back down
+// Tuna Marie's paddle sends it back down
 g = flying({}, { x: 300, y: 120, vy: -380 }); g.cpuPlan = () => 300; g.paddles.cpu.x = 300;
 run(g, 0.2); assert.ok(g.balls[0].vy > 0); assert.strictEqual(g.balls[0].lastHit, "cpu");
-console.log("Kevin's paddle OK");
+console.log("Tuna Marie's paddle OK");
 
 // Points, match point and winning at 7
 g = flying(); freezeCpu(g); g.paddles.player.x = 30; g.setInput({ targetX: 30 }); g.balls[0].x = 500;
@@ -56,11 +56,11 @@ g.score.cpu = 5; run(g, 1.5);
 assert.strictEqual(g.score.cpu, 6); assert.ok(g.events.some((e) => e.type === "matchPoint" && e.side === "cpu"));
 g = flying({}, { vy: -380 }); freezeCpu(g); g.score.player = 6;
 run(g, 1.5);
-assert.strictEqual(g.winner, "player"); assert.ok(g.over.startsWith("You beat Kevin"));
+assert.strictEqual(g.winner, "player"); assert.ok(g.over.startsWith("You beat Tuna Marie"));
 assert.ok(g.events.some((e) => e.type === "over" && e.winner === "player"));
 console.log("scoring OK");
 
-// Kevin returns most normal shots, misses more when he can't see, and gets better as you win
+// Tuna Marie returns most normal shots, misses more when he can't see, and gets better as you win
 function returnRate(wins, setup) {
   let returned = 0;
   const tries = 400;
@@ -84,11 +84,11 @@ function returnRate(wins, setup) {
 const rookie = returnRate(0);
 const pro = returnRate(6);
 const foggy = returnRate(0, (game) => { game.fx.cpu.fog = 100; game.rollCpuError(); });
-console.log(`  Kevin returns: ${(rookie * 100).toFixed(0)}% at the start, ${(pro * 100).toFixed(0)}% after 6 wins, ${(foggy * 100).toFixed(0)}% in fog`);
-assert.ok(rookie > 0.5 && rookie < 0.97, "rookie Kevin is good but beatable");
-assert.ok(pro > rookie, "Kevin improves");
-assert.ok(foggy < rookie - 0.1, "fog makes Kevin worse");
-console.log("Kevin OK");
+console.log(`  Tuna Marie returns: ${(rookie * 100).toFixed(0)}% at the start, ${(pro * 100).toFixed(0)}% after 6 wins, ${(foggy * 100).toFixed(0)}% in fog`);
+assert.ok(rookie > 0.5 && rookie < 0.97, "rookie Tuna Marie is good but beatable");
+assert.ok(pro > rookie, "Tuna Marie improves");
+assert.ok(foggy < rookie - 0.1, "fog makes Tuna Marie worse");
+console.log("Tuna Marie OK");
 
 // Mystery orbs: chaos only, 5-9 seconds apart, at most 2, fizzle after a while
 g = new PaddleGame(); assert.ok(g.nextOrbAt >= 5 && g.nextOrbAt <= 9);
@@ -110,7 +110,7 @@ assert.ok(g.left("player", "giant") > 0 && g.left("cpu", "giant") === 0, "you go
 assert.ok(g.events.some((e) => e.type === "orb" && e.owner === "player" && e.name === "giant"));
 g = flying({}, { y: 300, vy: 300, lastHit: "cpu" }); freezeCpu(g);
 g.orbs.push({ x: 300, y: 350, until: 100 }); g.pickOrb = () => "drunk";
-run(g, 0.3); assert.ok(g.left("cpu", "drunk") > 0, "Kevin got it");
+run(g, 0.3); assert.ok(g.left("cpu", "drunk") > 0, "Tuna Marie got it");
 console.log("orb ownership OK");
 
 function withOrb(side, name, setup) {
@@ -121,7 +121,7 @@ function withOrb(side, name, setup) {
   return game;
 }
 g = withOrb("player", "giant"); close(g.paddleWidth("player"), 160, "giant");
-g = withOrb("cpu", "tiny"); close(g.paddleWidth("cpu"), 55, "tiny"); close(g.paddleWidth("player"), 100, "only Kevin's");
+g = withOrb("cpu", "tiny"); close(g.paddleWidth("cpu"), 55, "tiny"); close(g.paddleWidth("player"), 100, "only Tuna Marie's");
 g = withOrb("player", "shield"); assert.ok(g.shield.player);
 g = withOrb("player", "multi"); assert.strictEqual(g.balls.length, 3);
 g = withOrb("player", "multi", (x) => { for (let i = 0; i < 4; i++) x.balls.push({ ...x.balls[0] }); });
@@ -133,14 +133,14 @@ for (const [name, orb] of Object.entries(ORBS)) {
 }
 console.log("orb effects OK");
 
-// Reversed and drunk paddles, for you and for Kevin
+// Reversed and drunk paddles, for you and for Tuna Marie
 g = withOrb("player", "reversed"); g.setInput({ targetX: 100 }); run(g, 0.5);
 assert.ok(g.paddles.player.x > 450, "mouse on the left sends your paddle right");
 g = withOrb("player", "drunk"); g.setInput({ targetX: 300 }); run(g, 0.8);
 g.setInput({ targetX: 100 }); run(g, 0.3); assert.ok(g.paddles.player.x > 290, "drunk: not yet");
 run(g, 0.4); assert.ok(g.paddles.player.x < 110, "drunk: there it goes");
 g = withOrb("cpu", "reversed"); g.cpuPlan = () => 100; run(g, 0.6);
-assert.ok(g.paddles.cpu.x > 450, "reversed Kevin goes the wrong way");
+assert.ok(g.paddles.cpu.x > 450, "reversed Tuna Marie goes the wrong way");
 console.log("reversed + drunk OK");
 
 // Slow-mo only slows the ball while it heads at whoever has it

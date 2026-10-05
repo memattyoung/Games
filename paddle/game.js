@@ -13,7 +13,7 @@ const COLORS = {
   orange: "#FFA24C",
   cyan: "#6FE3FF",
   pink: "#FF4FA3",
-  kevin: "#5CC2FF",
+  tuna: "#5CC2FF",
   fog: "5, 8, 12",
 };
 // How the paddles look. Drunk turns a paddle purple and reversed turns it orange, so it's obvious.
@@ -38,30 +38,30 @@ const EFFECTS = [
   { name: "SLOW-MO", color: "cyan", left: () => game.left("player", "slow"), total: () => SETTINGS.effectTime },
   { name: "SHIELD", color: "cyan", left: () => (game.shield.player ? 1 : 0), total: () => 1, noTimer: true },
 ];
-// Kevin's effects, written under his paddle so you can laugh at him
-const KEVIN_EFFECTS = [["giant", "GIANT"], ["tiny", "TINY"], ["reversed", "REVERSED"], ["drunk", "DRUNK"],
+// Tuna Marie's effects, written under his paddle so you can laugh at him
+const TUNA_EFFECTS = [["giant", "GIANT"], ["tiny", "TINY"], ["reversed", "REVERSED"], ["drunk", "DRUNK"],
   ["fog", "FOGGED"], ["invisible", "BLIND"], ["curve", "CURVE"], ["slow", "SLOW-MO"]];
 
-// The sass. Kevin has a lot to say.
-const KEVIN_HELLO = ["Prepare to lose, human.", "Oh good. You're back.", "I've been practising.",
+// The sass. Tuna Marie has a lot to say.
+const TUNA_HELLO = ["Prepare to lose, human.", "Oh good. You're back.", "I've been practising.",
   "Let's go, meat-based player.", "Try to keep up."];
-const KEVIN_ANGRY = ["Okay. Now I'm trying.", "That last match was a fluke.", "I updated my drivers. You're done.",
+const TUNA_ANGRY = ["Okay. Now I'm trying.", "That last match was a fluke.", "I updated my drivers. You're done.",
   "Round two. No more Mr Nice Computer."];
-const KEVIN_SCORES = ["Too easy.", "Did you blink?", "I'm not even trying.", "Beep boop. You lose.",
+const TUNA_SCORES = ["Too easy.", "Did you blink?", "I'm not even trying.", "Beep boop. You lose.",
   "Is your paddle decorative?", "Calculated.", "You call that defence?", "Get good."];
-const KEVIN_CONCEDES = ["Lag.", "That didn't count.", "My fan was on.", "Lucky.", "I let you have that.",
+const TUNA_CONCEDES = ["Lag.", "That didn't count.", "My fan was on.", "Lucky.", "I let you have that.",
   "Rude.", "Hacks!", "I wasn't ready."];
-const KEVIN_LAUGHS = ["Ha! Enjoy that.", "Karma.", "LOL.", "That one's my favourite.", "Oh no. Anyway."];
-const KEVIN_JEALOUS = ["Hey, that's not fair!", "Who keeps leaving those there?", "Cheater.", "Ugh. Fine."];
-const KEVIN_RALLY = ["Okay, this is getting intense.", "Just give up already.", "I can do this all day.",
+const TUNA_LAUGHS = ["Ha! Enjoy that.", "Karma.", "LOL.", "That one's my favourite.", "Oh no. Anyway."];
+const TUNA_JEALOUS = ["Hey, that's not fair!", "Who keeps leaving those there?", "Cheater.", "Ugh. Fine."];
+const TUNA_RALLY = ["Okay, this is getting intense.", "Just give up already.", "I can do this all day.",
   "My circuits are sweating."];
 const MISSED = ["MISSED", "OOPS", "YIKES", "SKILL ISSUE", "BUTTERFINGERS", "REALLY?"];
-const SCORED = ["NICE", "GOT HIM", "TAKE THAT, KEVIN", "BOOM", "WHO'S CRYING NOW"];
-const LOSS_TAUNTS = ["Beaten by a computer named Kevin.", "Kevin is already telling his friends.",
-  "Your paddle is filing a complaint.", "That was hard to watch. Kevin loved it.",
-  "Rage quit? Kevin would love that.", "Kevin didn't even use all his processing power."];
-const WIN_SULKS = ["Kevin: \"I demand a rematch.\"", "Kevin: \"My fan was on.\"", "Kevin: \"Best of three?\"",
-  "Kevin: \"I was lagging.\"", "Kevin: \"I let you win. Obviously.\""];
+const SCORED = ["NICE", "GOT HIM", "TAKE THAT, TUNA MARIE", "BOOM", "WHO'S CRYING NOW"];
+const LOSS_TAUNTS = ["Beaten by a computer named Tuna Marie.", "Tuna Marie is already telling his friends.",
+  "Your paddle is filing a complaint.", "That was hard to watch. Tuna Marie loved it.",
+  "Rage quit? Tuna Marie would love that.", "Tuna Marie didn't even use all his processing power."];
+const WIN_SULKS = ["Tuna Marie: \"I demand a rematch.\"", "Tuna Marie: \"My fan was on.\"", "Tuna Marie: \"Best of three?\"",
+  "Tuna Marie: \"I was lagging.\"", "Tuna Marie: \"I let you win. Obviously.\""];
 
 const BORDER = 4;          // the court's border width in style.css
 const POPUP_TIME = 1.0;
@@ -89,7 +89,7 @@ let best = loadBest();    // your longest win streak in this mode
 let scale = 1;            // CSS pixels per court unit
 let popups = [];
 let particles = [];
-let speech = null;        // what Kevin is saying right now
+let speech = null;        // what Tuna Marie is saying right now
 let banner = null;        // the big "MATCH POINT" message
 let shake = { until: 0, strength: 0 };
 const trails = new WeakMap();
@@ -327,12 +327,12 @@ function drawPaddle(side, now) {
   roundedRect(ctx, x + 6, y + 2, width - 12, 3, 1.5);
   ctx.fill();
 
-  if (side === "cpu") drawKevinFace(cx, y + height / 2, width, now);
+  if (side === "cpu") drawTunaFace(cx, y + height / 2, width, now);
   ctx.restore();
 }
 
-function drawKevinFace(cx, cy, width, now) {
-  // Kevin's eyes follow the ball, and his eyebrows show how he feels about the score
+function drawTunaFace(cx, cy, width, now) {
+  // Tuna Marie's eyes follow the ball, and his eyebrows show how he feels about the score
   const ball = game.balls[0];
   const look = ball ? clamp((ball.x - cx) / 120, -1, 1) * 2.2 : 0;
   const gap = Math.min(16, width / 5);
@@ -358,9 +358,9 @@ function drawKevinFace(cx, cy, width, now) {
   }
 }
 
-function drawKevinTags(now) {
-  // Kevin's active effects, under his paddle
-  const tags = KEVIN_EFFECTS.filter(([name]) => game.left("cpu", name) > 0)
+function drawTunaTags(now) {
+  // Tuna Marie's active effects, under his paddle
+  const tags = TUNA_EFFECTS.filter(([name]) => game.left("cpu", name) > 0)
     .map(([name, label]) => `${label} ${Math.ceil(game.left("cpu", name))}s`);
   if (game.shield.cpu) tags.push("SHIELDED");
   if (!tags.length) return;
@@ -448,7 +448,7 @@ function drawSpeech(now) {
     speech = null;
     return;
   }
-  // A speech bubble hanging off Kevin's paddle
+  // A speech bubble hanging off Tuna Marie's paddle
   ctx.font = '800 17px -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
   const width = Math.min(ctx.measureText(speech.text).width + 28, W - 30);
   const x = clamp(game.paddles.cpu.x - width / 2, 15, W - 15 - width);
@@ -555,7 +555,7 @@ function draw(now, dt) {
   drawFog();
   drawPaddle("cpu", now);     // paddles go over the fog, so you can always see them
   drawPaddle("player", now);
-  drawKevinTags(now);
+  drawTunaTags(now);
   drawServe(now);
   drawPopups(now);
   drawSpeech(now);
@@ -623,20 +623,19 @@ function showOverlay(kind) {
   setText($("overlay-eyebrow"), kind === "start" ? "MATT YOUNG PRESENTS" : "");
   setText($("overlay-taunt"), "");
   $("modes").hidden = kind === "paused" || kind === "won";  // switching mode would end your streak
-  $("menu-link").hidden = kind === "paused";
-  const score = `You ${game.score.player} – ${game.score.cpu} Kevin`;
+  const score = `You ${game.score.player} – ${game.score.cpu} Tuna Marie`;
 
   if (kind === "start") {
     setText($("overlay-title"), "CHAOS PADDLE");
     setText($("overlay-reason"), "");
     setText($("overlay-stats"), gameMode === "classic"
-      ? "You, Kevin and one ball. Old school. Kevin still talks, though."
-      : "First to 7 beats Kevin. Kevin cheats. So do the orbs.");
+      ? "You, Tuna Marie and one ball. Old school. Tuna Marie still talks, though."
+      : "First to 7 beats Tuna Marie. Tuna Marie cheats. So do the orbs.");
     setText(playButton, "Play");
     setText($("overlay-hint"), isTouch ? "Drag to move your paddle." : "or press Space");
   } else if (kind === "paused") {
     setText($("overlay-title"), "PAUSED");
-    setText($("overlay-reason"), "Kevin is waiting. He's tapping his foot.");
+    setText($("overlay-reason"), "Tuna Marie is waiting. He's tapping his foot.");
     setText($("overlay-stats"), score);
     setText(playButton, "Resume");
     setText($("overlay-hint"), keyHint);
@@ -644,7 +643,7 @@ function showOverlay(kind) {
     setText($("overlay-title"), "YOU WIN?!");
     setText($("overlay-reason"), pick(WIN_SULKS));
     setText($("overlay-stats"), `${score}  ·  Win streak ${streak}  ·  Best ${best}`);
-    setText($("overlay-taunt"), `Longest rally: ${game.longestRally}. Next match, Kevin gets faster and sharper.`);
+    setText($("overlay-taunt"), `Longest rally: ${game.longestRally}. Next match, Tuna Marie gets faster and sharper.`);
     setText(playButton, "Next match");
     setText($("overlay-hint"), keyHint);
   } else {
@@ -690,7 +689,7 @@ function startMatch() {
   mode = "playing";
   overlay.hidden = true;
   playButton.blur();
-  say(streak > 0 ? pick(KEVIN_ANGRY) : pick(KEVIN_HELLO));
+  say(streak > 0 ? pick(TUNA_ANGRY) : pick(TUNA_HELLO));
 }
 
 function pause() {
@@ -724,10 +723,10 @@ function handleEvents() {
   for (const event of game.events) {
     switch (event.type) {
       case "hit":
-        burst(event.x, event.y, event.side === "player" ? COLORS.green : COLORS.kevin, 7, 200);
+        burst(event.x, event.y, event.side === "player" ? COLORS.green : COLORS.tuna, 7, 200);
         if (event.rally > 0 && event.rally % 10 === 0) {
           addPopup(W / 2, H / 2, `RALLY ×${event.rally}`, COLORS.gold, { size: 26 });
-          if (!game.classic) say(pick(KEVIN_RALLY));
+          if (!game.classic) say(pick(TUNA_RALLY));
         }
         break;
       case "orbSpawn":
@@ -743,10 +742,10 @@ function handleEvents() {
         if (event.owner === "player") {
           showLastOrb(event.kind, orb.text, color);
           addPopup(event.x, event.y, orb.popup, color, { size: 24 });
-          say(event.kind === "bad" ? pick(KEVIN_LAUGHS) : pick(KEVIN_JEALOUS));
+          say(event.kind === "bad" ? pick(TUNA_LAUGHS) : pick(TUNA_JEALOUS));
         } else {
-          showLastOrb(event.kind, orb.cpuText, COLORS.kevin);
-          addPopup(event.x, event.y, `KEVIN: ${orb.popup}`, COLORS.kevin, { size: 22 });
+          showLastOrb(event.kind, orb.cpuText, COLORS.tuna);
+          addPopup(event.x, event.y, `TUNA MARIE: ${orb.popup}`, COLORS.tuna, { size: 22 });
           say(orb.quip);
         }
         break;
@@ -761,11 +760,11 @@ function handleEvents() {
         if (event.scorer === "player") {
           burst(event.x, 20, COLORS.green, 30, 340);
           addPopup(event.x, 110, pick(SCORED), COLORS.green, { size: 26, rise: 40 });
-          say(pick(KEVIN_CONCEDES));
+          say(pick(TUNA_CONCEDES));
         } else {
           burst(event.x, H - 20, COLORS.red, 30, 340);
           addPopup(event.x, H - 110, pick(MISSED), COLORS.red, { size: 26 });
-          say(pick(KEVIN_SCORES));
+          say(pick(TUNA_SCORES));
         }
         break;
       case "matchPoint":

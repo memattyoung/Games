@@ -546,7 +546,6 @@ function showOverlay(kind) {
   setText($("overlay-eyebrow"), kind === "start" ? "MATT YOUNG PRESENTS" : "");
   setText($("overlay-taunt"), "");
   $("switches").hidden = kind === "paused";   // the mode and size can only change between games
-  $("menu-link").hidden = kind === "paused";
 
   if (kind === "start") {
     setText($("overlay-title"), "CHAOS SWEEPER");

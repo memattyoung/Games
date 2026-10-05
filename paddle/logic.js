@@ -6,7 +6,7 @@ const SETTINGS = {
   width: 600,
   height: 800,
   playerY: 740,          // the top edge of your paddle, at the bottom of the court
-  cpuY: 46,              // the top edge of Kevin's paddle, at the top of the court
+  cpuY: 46,              // the top edge of Tuna Marie's paddle, at the top of the court
   paddleHeight: 14,
   paddleWidth: 100,
   paddleKeySpeed: 900,   // how fast the arrow keys move your paddle, per second
@@ -36,43 +36,43 @@ const SETTINGS = {
   tiltPush: 260,         // how hard a tilted court pulls the ball sideways
   shieldPlayerY: 782,    // where the shields sit behind each goal
   shieldCpuY: 18,
-  cpuBaseSpeed: 340,     // how fast Kevin can move his paddle, per second...
+  cpuBaseSpeed: 340,     // how fast Tuna Marie can move his paddle, per second...
   cpuSpeedPerWin: 70,    // ...and how much faster he gets every match you win
   cpuMaxSpeed: 980,
-  cpuBaseError: 80,      // how far off Kevin's aim can be, in court units...
+  cpuBaseError: 80,      // how far off Tuna Marie's aim can be, in court units...
   cpuErrorPerWin: 8,     // ...getting sharper every match you win
   cpuMinError: 20,
-  cpuThink: 0.12,        // Kevin rethinks where to go this often, in seconds
+  cpuThink: 0.12,        // Tuna Marie rethinks where to go this often, in seconds
 };
 
 const SIDES = ["player", "cpu"];
 const OTHER = { player: "cpu", cpu: "player" };
 
 // Every orb looks the same until the ball hits it. Whoever last touched the ball gets the effect.
-// "text" is what you see when you get it, "cpuText" when Kevin does, "quip" is Kevin complaining.
+// "text" is what you see when you get it, "cpuText" when Tuna Marie does, "quip" is Tuna Marie complaining.
 const ORBS = {
   giant: { kind: "good", weight: 1, popup: "GIANT!", text: "Good: giant paddle. Finally, a fair fight.",
-    cpuText: "Kevin got a giant paddle. Cheater.", quip: "Size upgrade installed." },
-  multi: { kind: "good", weight: 1, popup: "MULTIBALL!", text: "Good: multiball. Kevin hates this one.",
-    cpuText: "Kevin set off multiball. Chaos for everyone.", quip: "More balls, more problems. For YOU." },
+    cpuText: "Tuna Marie got a giant paddle. Cheater.", quip: "Size upgrade installed." },
+  multi: { kind: "good", weight: 1, popup: "MULTIBALL!", text: "Good: multiball. Tuna Marie hates this one.",
+    cpuText: "Tuna Marie set off multiball. Chaos for everyone.", quip: "More balls, more problems. For YOU." },
   curve: { kind: "good", weight: 1, popup: "CURVE!", text: "Good: curveballs. Your shots bend now. Show-off.",
-    cpuText: "Kevin's shots curve now. Ugh.", quip: "Watch this. Physics is optional." },
+    cpuText: "Tuna Marie's shots curve now. Ugh.", quip: "Watch this. Physics is optional." },
   slow: { kind: "good", weight: 1, popup: "SLOW-MO", text: "Good: slow-mo. The ball strolls over to you.",
-    cpuText: "Kevin got slow-mo. The ball takes its sweet time getting to him.", quip: "Ahh. Plenty of time." },
+    cpuText: "Tuna Marie got slow-mo. The ball takes its sweet time getting to him.", quip: "Ahh. Plenty of time." },
   shield: { kind: "good", weight: 1, popup: "SHIELD!", text: "Good: a shield behind you. One free save.",
-    cpuText: "Kevin got a shield. Coward.", quip: "Try getting past THAT." },
+    cpuText: "Tuna Marie got a shield. Coward.", quip: "Try getting past THAT." },
   tiny: { kind: "bad", weight: 1, popup: "TINY!", text: "Bad: tiny paddle. Good luck with that.",
-    cpuText: "Kevin got a tiny paddle. Ha!", quip: "Hey! Give that back!" },
+    cpuText: "Tuna Marie got a tiny paddle. Ha!", quip: "Hey! Give that back!" },
   reversed: { kind: "bad", weight: 1, popup: "REVERSED!", text: "Bad: controls reversed. Left is right. Right is wrong.",
-    cpuText: "Kevin's controls are reversed. Watch him flail.", quip: "Which way is LEFT?!" },
-  drunk: { kind: "bad", weight: 1, popup: "DRUNK!", text: "Bad: drunk paddle. Kevin is laughing.",
-    cpuText: "Kevin is drunk. On electricity, probably.", quip: "I'm not drunk, YOU'RE drunk." },
+    cpuText: "Tuna Marie's controls are reversed. Watch him flail.", quip: "Which way is LEFT?!" },
+  drunk: { kind: "bad", weight: 1, popup: "DRUNK!", text: "Bad: drunk paddle. Tuna Marie is laughing.",
+    cpuText: "Tuna Marie is drunk. On electricity, probably.", quip: "I'm not drunk, YOU'RE drunk." },
   fog: { kind: "bad", weight: 1, popup: "FOG!", text: "Bad: fog. You can only see near the ball.",
-    cpuText: "Kevin is lost in the fog. He can't see a thing.", quip: "Who turned off the lights?" },
+    cpuText: "Tuna Marie is lost in the fog. He can't see a thing.", quip: "Who turned off the lights?" },
   invisible: { kind: "bad", weight: 1, popup: "WHERE'D IT GO?", text: "Bad: invisible ball. Just guess.",
-    cpuText: "The ball is invisible to Kevin. Sneaky.", quip: "Where'd it go?! Where'd it GO?!" },
+    cpuText: "The ball is invisible to Tuna Marie. Sneaky.", quip: "Where'd it go?! Where'd it GO?!" },
   tilt: { kind: "bad", weight: 1, popup: "TILT!", text: "Bad: the court tilts. Physics has left the chat.",
-    cpuText: "Kevin tilted the court. Everyone suffers.", quip: "Why is the floor slanted?" },
+    cpuText: "Tuna Marie tilted the court. Everyone suffers.", quip: "Why is the floor slanted?" },
 };
 const TIMED = ["giant", "curve", "slow", "tiny", "reversed", "drunk", "fog", "invisible", "tilt"];
 
@@ -82,7 +82,7 @@ function clamp(value, low, high) {
 
 class PaddleGame {
   // Classic mode is a plain duel: no mystery orbs, no effects.
-  // "wins" is how many matches you've won in a row, which makes Kevin (and the ball) better.
+  // "wins" is how many matches you've won in a row, which makes Tuna Marie (and the ball) better.
   constructor({ classic = false, random = Math.random, wins = 0 } = {}) {
     this.classic = classic;
     this.random = random;
@@ -101,7 +101,7 @@ class PaddleGame {
     this.input = { left: false, right: false, targetX: null };
     this.inputHistory = [];  // recent controls, so a drunk paddle can follow them late
     this.cpuTarget = SETTINGS.width / 2;
-    this.cpuHistory = [];    // Kevin's recent plans, for when he's drunk
+    this.cpuHistory = [];    // Tuna Marie's recent plans, for when he's drunk
     this.cpuError = 0;
     this.nextThinkAt = 0;
 
@@ -234,10 +234,10 @@ class PaddleGame {
     this.keepPaddlesOnCourt();
   }
 
-  // ---- Kevin, the computer ----
+  // ---- Tuna Marie, the computer ----
 
   rollCpuError() {
-    // Kevin isn't perfect: each shot coming at him, he misjudges it by a random amount
+    // Tuna Marie isn't perfect: each shot coming at him, he misjudges it by a random amount
     const error = Math.max(SETTINGS.cpuMinError, SETTINGS.cpuBaseError - SETTINGS.cpuErrorPerWin * this.wins);
     this.cpuError = (this.random() * 2 - 1) * error;
   }
@@ -245,7 +245,7 @@ class PaddleGame {
   cpuPlan() {
     const r = SETTINGS.ballRadius;
     const hitY = SETTINGS.cpuY + SETTINGS.paddleHeight + r;
-    // The ball coming at Kevin that's closest to him
+    // The ball coming at Tuna Marie that's closest to him
     const incoming = this.balls.filter((b) => !b.waiting && b.vy < 0).sort((a, b) => a.y - b.y)[0];
     if (!incoming) return SETTINGS.width / 2 + this.cpuError * 0.5;
 
@@ -334,7 +334,7 @@ class PaddleGame {
       ball.y = playerTop - r;
       this.hitPaddle(ball, "player");
     }
-    // Kevin's paddle, at the top
+    // Tuna Marie's paddle, at the top
     const cpuBottom = SETTINGS.cpuY + SETTINGS.paddleHeight;
     if (ball.vy < 0 && prevY - r >= cpuBottom - 1 && ball.y - r <= cpuBottom &&
         Math.abs(ball.x - this.paddles.cpu.x) <= this.paddleWidth("cpu") / 2 + r) {
@@ -392,8 +392,8 @@ class PaddleGame {
     if (this.score[scorer] >= SETTINGS.winScore) {
       this.balls = [];
       this.winner = scorer;
-      this.end(scorer === "player" ? "You beat Kevin. He's taking it personally."
-        : "Kevin wins. He will never let you forget this.");
+      this.end(scorer === "player" ? "You beat Tuna Marie. He's taking it personally."
+        : "Tuna Marie wins. He will never let you forget this.");
       return;
     }
     if (this.score[scorer] === SETTINGS.winScore - 1) this.events.push({ type: "matchPoint", side: scorer });
