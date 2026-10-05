@@ -1,6 +1,6 @@
-# Rage Quit Snake
+# Chaos Snake
 
-Matt Young presents **Rage Quit Snake**.
+Matt Young presents **Chaos Snake**, part of the [Rage Quit Menu](https://memattyoung.github.io/Games/).
 
 **[Play it here](https://memattyoung.github.io/Games/snake/)** on a phone or a computer.
 
@@ -11,11 +11,11 @@ You only find out what you ate after you eat it.
 
 Pick a mode on the start screen. Each mode keeps its own best score.
 
-- **Rage Quit:** the chaos described below.
+- **Chaos:** everything described below.
 - **Classic:** plain old snake. One apple at a time, each worth 1 point and 1 segment, and each
   one makes you 3% faster. No hunger, no surprises.
 
-## How to play (Rage Quit)
+## How to play (Chaos mode)
 
 - **Computer:** steer with the arrow keys or WASD. P pauses, Space starts.
 - **Phone:** swipe on the board, or use the arrow buttons under it.

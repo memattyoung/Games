@@ -4,9 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0D131A">
-  <title>Matt Young's Games</title>
+  <meta name="description" content="Matt Young presents the Rage Quit Menu: games that are fun right up until they aren't.">
+  <title>Rage Quit Menu</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect x='2' y='2' width='16' height='16' rx='4' fill='%23F05A4F'/%3E%3Ctext x='10' y='14.5' font-size='12' font-family='Arial' font-weight='900' text-anchor='middle' fill='%23fff'%3E!%3C/text%3E%3C/svg%3E">
   <style>
-    :root { --bg: #0D131A; --panel: #141C26; --border: #2E4053; --text: #E8EEF4; --dim: #8090A0; --green: #7BD65B; }
+    :root {
+      --bg: #0D131A;
+      --panel: #141C26;
+      --board: #18222D;
+      --border: #2E4053;
+      --text: #E8EEF4;
+      --dim: #8090A0;
+      --green: #7BD65B;
+      --red: #F05A4F;
+    }
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -16,36 +27,157 @@
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     }
-    main { max-width: 640px; margin: 0 auto; }
-    h1 { margin: 0 0 6px; font-size: 40px; color: var(--green); text-shadow: 3px 3px 0 #000; }
-    p { margin: 0 0 28px; color: var(--dim); }
-    a.game {
-      display: block;
-      padding: 20px 22px;
+    main { max-width: 720px; margin: 0 auto; }
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--dim);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(38px, 10vw, 56px);
+      line-height: 1;
+      color: var(--red);
+      text-shadow: 3px 3px 0 #000;
+    }
+    .tagline { margin: 0 0 32px; color: var(--dim); font-size: 17px; }
+    .games {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+      gap: 16px;
+    }
+    a.game, .soon {
+      display: flex;
+      flex-direction: column;
       border: 2px solid var(--border);
       border-radius: 14px;
       background: var(--panel);
       color: inherit;
       text-decoration: none;
+      overflow: hidden;
     }
-    a.game:hover { border-color: var(--green); }
-    a.game h2 { margin: 0 0 4px; font-size: 22px; }
-    a.game span { color: var(--dim); }
-    a.game + a.game { margin-top: 14px; }
+    a.game { transition: border-color 0.15s, transform 0.15s; }
+    a.game:hover, a.game:focus-visible { border-color: var(--green); transform: translateY(-2px); }
+    a.game:focus-visible { outline: none; }
+    .thumb { display: block; width: 100%; height: auto; background: var(--board); }
+    .info { padding: 16px 18px 18px; }
+    .info h2 { margin: 0 0 4px; font-size: 22px; }
+    .info p { margin: 0 0 12px; color: var(--dim); line-height: 1.4; }
+    .play {
+      display: inline-block;
+      padding: 7px 18px;
+      border-radius: 999px;
+      background: var(--green);
+      color: var(--bg);
+      font-weight: 800;
+    }
+    .soon {
+      align-items: center;
+      justify-content: center;
+      min-height: 180px;
+      border-style: dashed;
+      color: var(--dim);
+      text-align: center;
+      padding: 24px;
+    }
+    .soon b { display: block; margin-bottom: 4px; color: var(--text); font-size: 18px; }
   </style>
 </head>
 <body>
   <main>
-    <h1>MATT YOUNG'S GAMES</h1>
-    <p>Games I've made while learning to code.</p>
-    <a class="game" href="snake/">
-      <h2>Rage Quit Snake</h2>
-      <span>Snake where every apple is a mystery. Works on phones and computers.</span>
-    </a>
-    <a class="game" href="bricks/">
-      <h2>Rage Quit Brick Breaker</h2>
-      <span>A brick breaker where every capsule is a mystery, and most of them hate you.</span>
-    </a>
+    <p class="eyebrow">MATT YOUNG PRESENTS</p>
+    <h1>RAGE QUIT MENU</h1>
+    <p class="tagline">Games that are fun right up until they aren't.</p>
+
+    <div class="games">
+      <a class="game" href="snake/">
+        <svg class="thumb" viewBox="0 0 320 140" aria-hidden="true">
+          <rect width="320" height="140" fill="#18222D"/>
+          <g fill="#1C2834">
+            <rect x="20" y="20" width="20" height="20"/><rect x="60" y="20" width="20" height="20"/>
+            <rect x="100" y="20" width="20" height="20"/><rect x="140" y="20" width="20" height="20"/>
+            <rect x="180" y="20" width="20" height="20"/><rect x="220" y="20" width="20" height="20"/>
+            <rect x="260" y="20" width="20" height="20"/><rect x="40" y="60" width="20" height="20"/>
+            <rect x="80" y="60" width="20" height="20"/><rect x="120" y="60" width="20" height="20"/>
+            <rect x="160" y="60" width="20" height="20"/><rect x="200" y="60" width="20" height="20"/>
+            <rect x="240" y="60" width="20" height="20"/><rect x="280" y="60" width="20" height="20"/>
+            <rect x="20" y="100" width="20" height="20"/><rect x="60" y="100" width="20" height="20"/>
+            <rect x="100" y="100" width="20" height="20"/><rect x="140" y="100" width="20" height="20"/>
+            <rect x="180" y="100" width="20" height="20"/><rect x="220" y="100" width="20" height="20"/>
+            <rect x="260" y="100" width="20" height="20"/>
+          </g>
+          <g>
+            <rect x="62" y="82" width="18" height="18" rx="4" fill="#9A4B12"/>
+            <rect x="82" y="82" width="18" height="18" rx="4" fill="#5B2E91"/>
+            <rect x="102" y="82" width="18" height="18" rx="4" fill="#C9772A"/>
+            <rect x="122" y="82" width="18" height="18" rx="4" fill="#8452C8"/>
+            <rect x="142" y="82" width="18" height="18" rx="4" fill="#F59A3C"/>
+            <rect x="142" y="62" width="18" height="18" rx="4" fill="#A66BEA"/>
+            <rect x="141" y="41" width="20" height="20" rx="5" fill="#C08CFF"/>
+            <circle cx="146" cy="49" r="3" fill="#fff"/><circle cx="156" cy="49" r="3" fill="#fff"/>
+            <circle cx="146" cy="47.7" r="1.6" fill="#111"/><circle cx="156" cy="47.7" r="1.6" fill="#111"/>
+          </g>
+          <g>
+            <ellipse cx="230" cy="51" rx="8.5" ry="8" fill="#E8453C"/>
+            <path d="M229.2 44.5 L230.8 44.5 L231.8 39.5 L230.4 39.5 Z" fill="#7A5230"/>
+            <ellipse cx="234.6" cy="40.8" rx="3.6" ry="1.6" transform="rotate(-25 234.6 40.8)" fill="#5DBB63"/>
+            <ellipse cx="270" cy="111" rx="8.5" ry="8" fill="#E8453C"/>
+            <path d="M269.2 104.5 L270.8 104.5 L271.8 99.5 L270.4 99.5 Z" fill="#7A5230"/>
+            <ellipse cx="274.6" cy="100.8" rx="3.6" ry="1.6" transform="rotate(-25 274.6 100.8)" fill="#5DBB63"/>
+            <path d="M200 92 l7 -2 l5 5 l-2 7 l-7 2 l-5 -5 Z" fill="#7D8794" stroke="#3E4651"/>
+          </g>
+          <text x="166" y="38" font-family="Arial" font-weight="900" font-size="14" fill="#B98AF0" stroke="#0D131A" stroke-width="3" paint-order="stroke">DRUNK!</text>
+        </svg>
+        <div class="info">
+          <h2>Chaos Snake</h2>
+          <p>Every apple looks the same. Some help you, some get you drunk, reversed or lost in the fog.
+            And you're always starving.</p>
+          <span class="play">Play</span>
+        </div>
+      </a>
+
+      <a class="game" href="bricks/">
+        <svg class="thumb" viewBox="0 0 320 140" aria-hidden="true">
+          <defs>
+            <linearGradient id="rainbow" x1="0" x2="1">
+              <stop offset="0" stop-color="#FF6B6B"/><stop offset="0.25" stop-color="#FFB347"/>
+              <stop offset="0.5" stop-color="#FFE14D"/><stop offset="0.75" stop-color="#5CC2FF"/>
+              <stop offset="1" stop-color="#B98AF0"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="140" fill="#18222D"/>
+          <g>
+            <rect x="12" y="14" width="52" height="14" rx="3" fill="#F05A4F"/><rect x="68" y="14" width="52" height="14" rx="3" fill="#F05A4F"/>
+            <rect x="124" y="14" width="52" height="14" rx="3" fill="#F05A4F"/><rect x="180" y="14" width="52" height="14" rx="3" fill="#F05A4F"/>
+            <rect x="236" y="14" width="52" height="14" rx="3" fill="#F05A4F"/>
+            <rect x="12" y="32" width="52" height="14" rx="3" fill="#FF8A3D"/><rect x="68" y="32" width="52" height="14" rx="3" fill="url(#rainbow)"/>
+            <rect x="124" y="32" width="52" height="14" rx="3" fill="#FF8A3D"/><rect x="180" y="32" width="52" height="14" rx="3" fill="#FF8A3D"/>
+            <rect x="236" y="32" width="52" height="14" rx="3" fill="#FF8A3D"/>
+            <rect x="12" y="50" width="52" height="14" rx="3" fill="#F5C542"/><rect x="68" y="50" width="52" height="14" rx="3" fill="#F5C542"/>
+            <rect x="124" y="50" width="52" height="14" rx="3" fill="#7D8794"/><rect x="236" y="50" width="52" height="14" rx="3" fill="#F5C542"/>
+          </g>
+          <line x1="0" y1="112" x2="320" y2="112" stroke="#F05A4F" stroke-opacity="0.45" stroke-width="2" stroke-dasharray="8 6"/>
+          <rect x="190" y="70" width="26" height="12" rx="6" fill="#fff" stroke="#8090A0"/>
+          <text x="203" y="80" font-family="Arial" font-weight="900" font-size="11" text-anchor="middle" fill="#FF4FA3">?</text>
+          <circle cx="132" cy="88" r="6" fill="#fff"/>
+          <circle cx="160" cy="76" r="6" fill="#fff"/>
+          <rect x="108" y="118" width="84" height="10" rx="5" fill="#FFBE6E"/>
+          <text x="222" y="104" font-family="Arial" font-weight="900" font-size="14" fill="#F05A4F" stroke="#0D131A" stroke-width="3" paint-order="stroke">SKILL ISSUE</text>
+        </svg>
+        <div class="info">
+          <h2>Chaos Breaker</h2>
+          <p>A brick breaker where every capsule is a mystery, the wall keeps coming, and most things
+            hate you.</p>
+          <span class="play">Play</span>
+        </div>
+      </a>
+
+      <div class="soon">
+        <div><b>More chaos coming</b>The next game is already plotting against you.</div>
+      </div>
+    </div>
   </main>
 </body>
 </html>

@@ -301,6 +301,20 @@ body {
   font-size: 13px;
 }
 
+/* Back to the Rage Quit Menu, which lists all the games */
+.menu-link {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 7px 16px;
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.menu-link:hover { border-color: var(--green); }
+
 .rules-link {
   display: none;
   margin-top: 12px;

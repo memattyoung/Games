@@ -1,4 +1,4 @@
-// Drawing, controls and screens for Rage Quit Brick Breaker. The rules live in logic.js.
+// Drawing, controls and screens for Chaos Breaker. The rules live in logic.js.
 "use strict";
 
 const COLORS = {
@@ -640,9 +640,10 @@ function showOverlay(kind) {
   setText($("overlay-eyebrow"), kind === "start" ? "MATT YOUNG PRESENTS" : "");
   setText($("overlay-taunt"), "");
   $("modes").hidden = kind === "paused";  // the mode can only change between games
+  $("menu-link").hidden = kind === "paused";
 
   if (kind === "start") {
-    setText($("overlay-title"), "RAGE QUIT BRICK BREAKER");
+    setText($("overlay-title"), "CHAOS BREAKER");
     setText($("overlay-reason"), "");
     setText($("overlay-stats"), gameMode === "classic"
       ? "Just bricks. No drama. Kind of boring, honestly."

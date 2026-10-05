@@ -1,4 +1,4 @@
-// The rules of Rage Quit Brick Breaker, with no drawing code, so they can be tested on their own.
+// The rules of Chaos Breaker, with no drawing code, so they can be tested on their own.
 // game.js handles drawing and controls. Everything here is measured on a 600 x 800 board.
 "use strict";
 
@@ -133,7 +133,7 @@ class BrickGame {
         });
       }
     }
-    // From level 3, Rage Quit mixes in some steel bricks that never break
+    // From level 3, Chaos mode mixes in some steel bricks that never break
     if (!this.classic && this.level >= 3) {
       for (let i = 0; i < Math.min(this.level - 2, 4); i++) {
         const brick = this.bricks[Math.floor(this.random() * this.bricks.length)];

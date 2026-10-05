@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0D131A">
-  <meta name="description" content="Matt Young presents Rage Quit Snake: a snake game where every apple is a mystery. Plays on phones and computers.">
-  <title>Rage Quit Snake</title>
+  <meta name="description" content="Matt Young presents Chaos Snake: a snake game where every apple is a mystery. Plays on phones and computers.">
+  <title>Chaos Snake</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='11' r='8' fill='%23E8453C'/%3E%3Cpath d='M10 4 L11 1' stroke='%237A5230' stroke-width='1.6'/%3E%3Cellipse cx='14' cy='3' rx='3.5' ry='1.6' fill='%235DBB63'/%3E%3C/svg%3E">
   <!-- Bump ?v= whenever style.css, logic.js or game.js change, so browsers never mix old and new files -->
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
   <main class="app">
@@ -38,16 +38,17 @@
         <div class="overlay" id="overlay">
           <div class="panel">
             <p class="eyebrow" id="overlay-eyebrow">MATT YOUNG PRESENTS</p>
-            <h1 id="overlay-title">RAGE QUIT SNAKE</h1>
+            <h1 id="overlay-title">CHAOS SNAKE</h1>
             <p class="reason" id="overlay-reason"></p>
             <p class="stats" id="overlay-stats"></p>
             <p class="breakdown" id="overlay-breakdown"></p>
             <div class="modes" id="modes" role="radiogroup" aria-label="Game mode">
-              <button type="button" class="mode" role="radio" data-mode="rage">Rage Quit</button>
+              <button type="button" class="mode" role="radio" data-mode="rage">Chaos</button>
               <button type="button" class="mode" role="radio" data-mode="classic">Classic</button>
             </div>
             <button type="button" class="play" id="play-button">Play</button>
             <p class="hint" id="overlay-hint"></p>
+            <a class="menu-link" id="menu-link" href="../">&larr; Rage Quit Menu</a>
             <a class="rules-link" href="#rules">How to play &darr;</a>
           </div>
         </div>
@@ -77,7 +78,7 @@
         <h3>CLASSIC MODE</h3>
         <p>Plain old snake. There's one apple at a time: eat it to grow 1 segment and score 1 point.
           Each apple makes you <span data-setting="classicSpeedUp"></span>% faster.</p>
-        <p class="hint-text">Want chaos? Pick Rage Quit on the start screen.</p>
+        <p class="hint-text">Want chaos? Pick Chaos on the start screen.</p>
       </div>
 
       <div class="rules-rage">
@@ -149,7 +150,7 @@
     </aside>
   </main>
 
-  <script src="logic.js?v=6"></script>
-  <script src="game.js?v=6"></script>
+  <script src="logic.js?v=7"></script>
+  <script src="game.js?v=7"></script>
 </body>
 </html>

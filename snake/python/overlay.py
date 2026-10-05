@@ -29,7 +29,7 @@ class Overlay(Turtle):
     def show_start(self):
         self.panel(520, 240)
         self.text("MATT YOUNG PRESENTS", 72, DIM_TEXT, ("Arial", 14, "bold"))
-        self.text("RAGE QUIT SNAKE", 15, GREEN, TITLE_FONT, shadow=True)
+        self.text("CHAOS SNAKE", 15, GREEN, TITLE_FONT, shadow=True)
         self.text("Read the rules on the right, then", -25, DIM_TEXT, ("Arial", 14, "normal"))
         self.text("press SPACE to start", -65, TEXT, ("Arial", 20, "bold"))
 

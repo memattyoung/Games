@@ -1,6 +1,6 @@
-# Rage Quit Brick Breaker
+# Chaos Breaker
 
-Matt Young presents **Rage Quit Brick Breaker**.
+Matt Young presents **Chaos Breaker**, part of the [Rage Quit Menu](https://memattyoung.github.io/Games/).
 
 **[Play it here](https://memattyoung.github.io/Games/bricks/)** on a phone or a computer.
 
@@ -10,7 +10,7 @@ A brick breaker where every capsule is a mystery, and most of them hate you.
 
 Pick a mode on the start screen. Each mode keeps its own best score.
 
-- **Rage Quit:** the chaos described below.
+- **Chaos:** everything described below.
 - **Classic:** plain brick breaker. No capsules, no creeping wall, no combos.
 
 ## How to play
@@ -23,7 +23,7 @@ Pick a mode on the start screen. Each mode keeps its own best score.
 Break every brick to clear the level. Each level adds more bricks, and some take a few hits. You
 get 3 lives.
 
-### The wall (Rage Quit)
+### The wall (Chaos mode)
 
 The whole wall creeps down a row every 10 to 24 seconds, faster when there are more bricks left. If
 it reaches the red line above your paddle, the game is over, even with lives left.
@@ -34,7 +34,7 @@ it reaches the red line above your paddle, the game is over, even with lives lef
 paddle adds 1 to it. Clearing a level is worth 100 times the level number. Now and then a brick
 turns rainbow for 8 seconds and is worth 250 points (times your combo).
 
-### Mystery capsules (Rage Quit)
+### Mystery capsules (Chaos mode)
 
 About 1 in 5 broken bricks drops a capsule. They all look the same until you catch one:
 
