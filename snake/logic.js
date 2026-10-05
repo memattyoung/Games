@@ -35,6 +35,13 @@ const OPPOSITE = { up: "down", down: "up", left: "right", right: "left" };
 // Grid y grows downward, like the screen
 const STEP = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 const MAX_QUEUED_TURNS = 4;
+// Why the game ended. You deserve to know.
+const REASONS = {
+  wall: "You drove into a wall. It was right there.",
+  body: "You bit your own tail. Classic.",
+  rock: "You hit a rock. The one you made.",
+  starved: "Your snake starved to death. You had one job.",
+};
 
 class SnakeGame {
   // Classic mode is plain snake: one apple at a time, no hunger and none of the crazy rules
@@ -157,11 +164,11 @@ class SnakeGame {
 
   crashAt(cell) {
     // Returns why moving into this cell would end the game, or null if it's safe
-    if (cell.x < 0 || cell.x >= this.cols || cell.y < 0 || cell.y >= this.rows) return "You crashed!";
-    if (this.rocks.some((r) => r.x === cell.x && r.y === cell.y)) return "You hit a rock!";
+    if (cell.x < 0 || cell.x >= this.cols || cell.y < 0 || cell.y >= this.rows) return REASONS.wall;
+    if (this.rocks.some((r) => r.x === cell.x && r.y === cell.y)) return REASONS.rock;
     // The tail moves out of the way this step, so it doesn't count
     const body = this.segments.slice(1, this.segments.length - 1);
-    if (body.some((s) => s.x === cell.x && s.y === cell.y)) return "You crashed!";
+    if (body.some((s) => s.x === cell.x && s.y === cell.y)) return REASONS.body;
     return null;
   }
 
@@ -246,7 +253,7 @@ class SnakeGame {
     if (type === NORMAL) {
       this.grow(1);
       this.changeSpeed(5);
-      return { text: "Normal: +1 segment, speed +5%", popup: "+1" };
+      return { text: "Normal: +1, speed +5%. Boring, but fine.", popup: "+1" };
     }
 
     if (type === BENEFIT) {
@@ -254,21 +261,21 @@ class SnakeGame {
       if (effect === "slower") {
         this.grow(1);
         this.changeSpeed(-10);
-        return { text: "Benefit: +1 segment, speed -10%", popup: "SLOWER" };
+        return { text: "Benefit: +1, 10% slower. Take a breath.", popup: "SLOWER" };
       }
       if (effect === "grow") {
         this.grow(2);
-        return { text: "Benefit: +2 segments", popup: "+2" };
+        return { text: "Benefit: +2 segments. Look at you go.", popup: "+2" };
       }
       // Apart from the ones that say otherwise, every apple grows you by 1
       if (effect === "shield") {
         this.grow(1);
         this.shield = true;
-        return { text: "Benefit: shield! Next crash forgiven", popup: "SHIELD!" };
+        return { text: "Benefit: shield! You'll need it.", popup: "SHIELD!" };
       }
       this.grow(1);
       this.ghostUntil = this.time + SETTINGS.effectTime;
-      return { text: "Benefit: ghost! Go through walls", popup: "GHOST!" };
+      return { text: "Benefit: ghost! Walls are optional.", popup: "GHOST!" };
     }
 
     // Otherwise it's bad food. It still grows you by 1, unless it's the one that shrinks you.
@@ -276,35 +283,35 @@ class SnakeGame {
     if (effect !== "shrink") this.grow(1);
     if (effect === "faster") {
       this.changeSpeed(20);
-      return { text: "Bad: speed +20%", popup: "FASTER!" };
+      return { text: "Bad: speed +20%. Hope you like panic.", popup: "FASTER!" };
     }
     if (effect === "shrink") {
       // A bad apple can hurt, but it never shrinks the snake below shrinkFloor
       const lost = Math.min(SETTINGS.badShrink, Math.max(0, this.segments.length - SETTINGS.shrinkFloor));
       this.shrink(lost);
-      if (lost === 0) return { text: "Bad: shrink, but you're already tiny", popup: "SAFE" };
+      if (lost === 0) return { text: "Bad: shrink, but you're already tiny.", popup: "SAFE" };
       return { text: `Bad: -${lost} segment${lost > 1 ? "s" : ""}`, popup: `-${lost}` };
     }
     if (effect === "reverse") {
       this.reversedUntil = this.time + SETTINGS.effectTime;
-      return { text: "Bad: controls reversed!", popup: "REVERSED!" };
+      return { text: "Bad: reversed! Left is right now.", popup: "REVERSED!" };
     }
     if (effect === "drunk") {
       this.drunkUntil = this.time + SETTINGS.effectTime;
-      return { text: "Bad: drunk!", popup: "DRUNK!" };
+      return { text: "Bad: drunk! Someone spiked the apple.", popup: "DRUNK!" };
     }
     if (effect === "rock") {
       // Left right where you ate it, for the rest of the game
       this.rocks.push({ x: at.x, y: at.y });
-      return { text: "Bad: a rock appeared!", popup: "ROCK!" };
+      return { text: "Bad: a rock appeared. You did that.", popup: "ROCK!" };
     }
     if (effect === "fog") {
       this.fogUntil = this.time + SETTINGS.fogTime;
-      return { text: "Bad: fog!", popup: "FOG!" };
+      return { text: "Bad: fog! Good luck finding anything.", popup: "FOG!" };
     }
     this.runawayUntil = this.time + SETTINGS.effectTime;
     this.nextRunawayAt = this.time + SETTINGS.runawayStep;
-    return { text: "Bad: the apples are running away!", popup: "RUNAWAY!" };
+    return { text: "Bad: runaway apples. Even food hates you.", popup: "RUNAWAY!" };
   }
 
   runAway() {
@@ -365,7 +372,7 @@ class SnakeGame {
     this.nextJackpotAt = this.jackpotGap();
     this.eaten.jackpot += 1;
     const points = this.addPoints(SETTINGS.jackpotPoints);
-    this.events.push({ type: "ate", food: JACKPOT, x: at.x, y: at.y, text: `Jackpot! +${points} points`,
+    this.events.push({ type: "ate", food: JACKPOT, x: at.x, y: at.y, text: `Jackpot! +${points} points. Big spender.`,
       popup: `+${points}`, points, combo: this.combo });
   }
 
@@ -384,7 +391,7 @@ class SnakeGame {
       if (this.segments.length === 1) {
         // Losing the head means there's nothing left
         this.segments = [];
-        this.end("Your snake starved to death!");
+        this.end(REASONS.starved);
         return;
       }
       this.segments.pop();
@@ -419,5 +426,5 @@ class SnakeGame {
 
 // Lets the tests load this file in Node; browsers just ignore it
 if (typeof module !== "undefined") {
-  module.exports = { SnakeGame, SETTINGS, NORMAL, BENEFIT, BAD, JACKPOT };
+  module.exports = { SnakeGame, SETTINGS, NORMAL, BENEFIT, BAD, JACKPOT, REASONS };
 }

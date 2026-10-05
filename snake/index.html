@@ -8,7 +8,7 @@
   <title>Chaos Snake</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='11' r='8' fill='%23E8453C'/%3E%3Cpath d='M10 4 L11 1' stroke='%237A5230' stroke-width='1.6'/%3E%3Cellipse cx='14' cy='3' rx='3.5' ry='1.6' fill='%235DBB63'/%3E%3C/svg%3E">
   <!-- Bump ?v= whenever style.css, logic.js or game.js change, so browsers never mix old and new files -->
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
   <main class="app">
@@ -42,6 +42,7 @@
             <p class="reason" id="overlay-reason"></p>
             <p class="stats" id="overlay-stats"></p>
             <p class="breakdown" id="overlay-breakdown"></p>
+            <p class="breakdown" id="overlay-taunt"></p>
             <div class="modes" id="modes" role="radiogroup" aria-label="Game mode">
               <button type="button" class="mode" role="radio" data-mode="rage">Chaos</button>
               <button type="button" class="mode" role="radio" data-mode="classic">Classic</button>
@@ -70,22 +71,22 @@
       <p>
         <span class="keys-only">Steer with the arrow keys (or WASD). P pauses.</span>
         <span class="touch-only">Swipe on the board or use the arrow buttons to steer.</span>
-        <span class="rules-rage">Hit a wall, a rock or your own body and the game is over.</span>
-        <span class="rules-classic">Hit a wall or your own body and the game is over.</span>
+        <span class="rules-rage">Hit a wall, a rock or your own body and the game is over. Obviously.</span>
+        <span class="rules-classic">Hit a wall or your own body and the game is over. Obviously.</span>
       </p>
 
       <div class="rules-classic">
         <h3>CLASSIC MODE</h3>
         <p>Plain old snake. There's one apple at a time: eat it to grow 1 segment and score 1 point.
-          Each apple makes you <span data-setting="classicSpeedUp"></span>% faster.</p>
+          Each apple makes you <span data-setting="classicSpeedUp"></span>% faster. Very relaxing. Until it isn't.</p>
         <p class="hint-text">Want chaos? Pick Chaos on the start screen.</p>
       </div>
 
       <div class="rules-rage">
       <h3>HUNGER</h3>
       <p>Your snake is always hungry and keeps shrinking, and the longer it is, the faster it
-        shrinks. When the hunger bar fills up, you lose a segment.</p>
-      <p class="danger">If your snake shrinks down to nothing, it starves to death.</p>
+        shrinks. When the hunger bar fills up, you lose a segment. Feed it.</p>
+      <p class="danger">If your snake shrinks down to nothing, it starves to death. That one's on you.</p>
 
       <h3>POINTS</h3>
       <p>Every apple is worth 1 point. Eat the next one within <span data-setting="comboTime"></span>
@@ -100,7 +101,7 @@
       <h3>APPLES</h3>
       <p>There are always <span data-setting="foodCount"></span> apples and they all look the same.
         Every apple grows your snake by 1 segment unless it says otherwise. You only find out what
-        you ate afterwards, next to your score.</p>
+        you ate afterwards, next to your score. Surprise!</p>
 
       <div class="food-rule">
         <canvas class="apple-icon" data-apple="normal" width="20" height="20"></canvas>
@@ -142,7 +143,7 @@
 
       <h3>GOOD TO KNOW</h3>
       <p>Your snake turns <b class="bad">purple</b> when drunk, <b class="reversed">orange</b> when
-        reversed, and see-through as a ghost. It flashes when an effect is about to wear off.
+        reversed, and see-through as a ghost. It flashes when an effect is about to wear off. You're welcome.
         Speed always stays between <span data-setting="minSpeed"></span>x and
         <span data-setting="maxSpeed"></span>x.</p>
       <p class="hint-text">Want plain snake? Pick Classic on the start screen.</p>
@@ -150,7 +151,7 @@
     </aside>
   </main>
 
-  <script src="logic.js?v=8"></script>
-  <script src="game.js?v=8"></script>
+  <script src="logic.js?v=9"></script>
+  <script src="game.js?v=9"></script>
 </body>
 </html>

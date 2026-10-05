@@ -44,6 +44,18 @@ const EFFECTS = [
     label: () => `COMBO ×${game.combo}` },
 ];
 
+// The sass
+const TAUNTS = ["That was… a choice.", "Rage quit? Totally understandable.", "The apples are laughing at you.",
+  "Bold strategy. Didn't work.", "Have you tried not crashing?", "Your snake deserved better.",
+  "Somewhere, an apple is telling its friends about you."];
+const CLASSIC_TAUNTS = ["Even plain snake got you.", "Classic mode. Classic mistakes.", "No tricks. No excuses.",
+  "That's the easy version, you know."];
+const PAUSE_LINES = ["Taking a breather? The apples will wait.", "Snack break. Not for the snake, obviously.",
+  "Go on, stretch. The snake isn't going anywhere."];
+const HUNGRY = ["-1", "-1", "HUNGRY", "FEED ME", "-1 (RUDE)"];
+const SAVED = ["SAVED!", "NOT TODAY", "SHIELD SAYS NO"];
+const CRASHED = ["BONK", "OUCH", "YIKES", "WOW."];
+
 const FULL_COLS = 39;      // the same board size as the Python version...
 const FULL_ROWS = 36;
 const MIN_FULL_CELL = 14;  // ...as long as each cell can be at least this many pixels
@@ -100,6 +112,10 @@ function blend(color1, color2, amount) {
     mixed += Math.round(start + (end - start) * amount).toString(16).padStart(2, "0");
   }
   return mixed;
+}
+
+function pick(list) {
+  return list[Math.floor(Math.random() * list.length)];
 }
 
 function setText(element, text) {
@@ -566,17 +582,18 @@ function showOverlay(kind) {
   const keyHint = isTouch ? "" : "or press Space";
   setText($("overlay-eyebrow"), kind === "start" ? "MATT YOUNG PRESENTS" : "");
   setText($("overlay-breakdown"), "");
+  setText($("overlay-taunt"), "");
   $("modes").hidden = kind === "paused";  // the mode can only change between games
 
   if (kind === "start") {
     setText($("overlay-title"), "CHAOS SNAKE");
     setText($("overlay-reason"), "");
-    setText($("overlay-stats"), gameMode === "classic" ? "Plain old snake. No surprises." : "Every apple is a mystery.");
+    setText($("overlay-stats"), gameMode === "classic" ? "Plain old snake. No surprises. How brave." : "Every apple is a mystery. Most of them are lying to you.");
     setText(playButton, "Play");
     setText($("overlay-hint"), isTouch ? "Swipe on the board or use the arrows to steer" : "or press Space");
   } else if (kind === "paused") {
     setText($("overlay-title"), "PAUSED");
-    setText($("overlay-reason"), "");
+    setText($("overlay-reason"), pick(PAUSE_LINES));
     setText($("overlay-stats"), `Score ${game.score}`);
     setText(playButton, "Resume");
     setText($("overlay-hint"), keyHint);
@@ -595,6 +612,7 @@ function showOverlay(kind) {
       setText($("overlay-breakdown"),
         `Ate ${ate.normal} normal · ${ate.benefit} benefit · ${ate.bad} bad · ${ate.jackpot} rainbow`);
     }
+    setText($("overlay-taunt"), newBest ? "Don't let it go to your head." : pick(game.classic ? CLASSIC_TAUNTS : TAUNTS));
     setText(playButton, "Play again");
     setText($("overlay-hint"), keyHint);
   }
@@ -657,14 +675,16 @@ function handleEvents() {
     if (event.type === "ate") {
       if (!game.classic) showLastFood(event.food, event.text);
       addPopup(event, event.popup, TYPE_COLORS[event.food]);
-      if (event.combo >= 2) addPopup(event, `COMBO ×${event.combo}`, COLORS.gold, 1);
+      if (event.combo >= 2) addPopup(event, event.combo >= SETTINGS.maxCombo ? `×${event.combo} SHOW-OFF` : `COMBO ×${event.combo}`, COLORS.gold, 1);
     } else if (event.type === "lost") {
-      addPopup(event, "-1", COLORS.dim);
+      addPopup(event, pick(HUNGRY), COLORS.dim);
     } else if (event.type === "saved") {
-      addPopup(event, "SAVED!", COLORS.cyan);
+      addPopup(event, pick(SAVED), COLORS.cyan);
     } else if (event.type === "jackpot") {
-      addPopup(event, "RAINBOW!", TYPE_COLORS.jackpot);
+      addPopup(event, "RAINBOW! GO GO GO", TYPE_COLORS.jackpot);
     } else if (event.type === "over") {
+      const head = game.segments[0];
+      if (head) addPopup(head, pick(CRASHED), COLORS.red);
       mode = "over";
       showOverlay("over");
     }

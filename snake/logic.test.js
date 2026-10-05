@@ -1,6 +1,6 @@
 // Tests for the game rules. Run with: node logic.test.js
 const assert = require("assert");
-const { SnakeGame, SETTINGS } = require("./logic.js");
+const { SnakeGame, SETTINGS, REASONS } = require("./logic.js");
 
 function run(game, seconds, step = 1 / 60) {
   for (let t = 0; t < seconds; t += step) game.update(step);
@@ -26,7 +26,7 @@ let g = emptyGame(10, 10);
 g.update(0.001); assert.deepStrictEqual(g.segments[0], { x: 6, y: 5 });
 run(g, 0.19); assert.deepStrictEqual(g.segments[0], { x: 6, y: 5 }, "moved too early");
 run(g, 0.02); assert.deepStrictEqual(g.segments[0], { x: 7, y: 5 });
-run(g, 2); assert.strictEqual(g.over, "You crashed!"); assert.strictEqual(g.segments[0].x, 9, "head left the board");
+run(g, 2); assert.strictEqual(g.over, REASONS.wall); assert.strictEqual(g.segments[0].x, 9, "head left the board");
 console.log("movement + wall OK");
 
 // Two quick presses can't reverse the snake
@@ -37,7 +37,7 @@ console.log("no reversing into yourself OK");
 // Self collision, and moving into the cell the tail is leaving is fine
 g = emptyGame(); g.grow(3); g.step(); g.step(); g.step();
 for (const d of ["up", "left", "down"]) { g.press(d); g.step(); }
-assert.strictEqual(g.over, "You crashed!");
+assert.strictEqual(g.over, REASONS.body);
 g = emptyGame(); g.grow(1); g.step();            // a 4-long snake can chase its own tail in a square
 for (const d of ["up", "left", "down", "right"]) { g.press(d); g.step(); }
 assert.strictEqual(g.over, null);
@@ -50,7 +50,7 @@ g.update(0.2); assert.strictEqual(len(g), 2);
 assert.ok(g.events.some((e) => e.type === "lost"));
 g.update(15.1); assert.strictEqual(len(g), 1);
 g.update(29.9); assert.strictEqual(g.over, null);
-g.update(0.2); assert.strictEqual(g.over, "Your snake starved to death!"); assert.strictEqual(len(g), 0);
+g.update(0.2); assert.strictEqual(g.over, REASONS.starved); assert.strictEqual(len(g), 0);
 console.log("hunger + starving OK");
 
 // Normal apple
@@ -77,7 +77,7 @@ assert.strictEqual(g.over, null); assert.strictEqual(g.shield, false);
 assert.deepStrictEqual(g.segments[0], { x: 9, y: 5 }, "snake should stay put");
 assert.ok(g.events.some((e) => e.type === "saved"));
 assert.ok(Math.abs(g.nextMoveAt - (g.time + SETTINGS.shieldPause)) < 1e-9);
-g.step(); assert.strictEqual(g.over, "You crashed!");
+g.step(); assert.strictEqual(g.over, REASONS.wall);
 g = emptyGame(); g.shield = true; g.rocks.push({ x: g.segments[0].x + 1, y: g.segments[0].y });
 g.step(); assert.strictEqual(g.over, null, "shield should cover rocks too");
 console.log("shield OK");
@@ -89,7 +89,7 @@ g.step(); assert.deepStrictEqual(g.segments[0], { x: 0, y: 5 }); assert.strictEq
 g.segments = [{ x: 4, y: 0 }, { x: 4, y: 1 }, { x: 4, y: 2 }]; g.heading = g.lastHeading = "up";
 g.step(); assert.deepStrictEqual(g.segments[0], { x: 4, y: 9 }, "should wrap top to bottom");
 g.ghostUntil = 0; g.segments = [{ x: 9, y: 5 }, { x: 8, y: 5 }, { x: 7, y: 5 }]; g.heading = g.lastHeading = "right";
-g.step(); assert.strictEqual(g.over, "You crashed!");
+g.step(); assert.strictEqual(g.over, REASONS.wall);
 console.log("ghost OK");
 
 // Bad apple: each of the 7 options
@@ -122,7 +122,7 @@ console.log("bad apple shrink floor OK");
 
 // Rocks: hitting one ends the game, and nothing spawns on them
 g = emptyGame(); g.rocks.push({ x: g.segments[0].x + 1, y: g.segments[0].y });
-g.step(); assert.strictEqual(g.over, "You hit a rock!");
+g.step(); assert.strictEqual(g.over, REASONS.rock);
 g = emptyGame(6, 6); g.segments = [{ x: 3, y: 3 }];
 for (let x = 0; x < 6; x++) for (let y = 0; y < 6; y++) {
   if (!(x === 0 && y === 0) && !(x === 3 && y === 3)) g.rocks.push({ x, y });
